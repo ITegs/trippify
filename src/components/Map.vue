@@ -1,15 +1,10 @@
 <template>
   <div id="map" />
-  <Modal id="modal">
-    <template #title>Johannes Trip </template>
-    <template #subtitle>Letzte Position: <b>München Maxvorstadt</b></template>
-  </Modal>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import L from 'leaflet'
-import Modal from '@/components/Modal.vue'
 
 onMounted(() => {
   const map = L.map('map').setView([51.505, -0.09], 13)
@@ -26,11 +21,5 @@ onMounted(() => {
 <style scoped lang="scss">
 #map {
   height: 95vh;
-}
-
-#modal {
-  position: absolute;
-  bottom: 0;
-  z-index: 999;
 }
 </style>
