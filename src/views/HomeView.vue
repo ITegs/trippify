@@ -1,8 +1,15 @@
 <template>
   <div id="map" />
   <Modal id="modal">
-    <template #title>Johannes Trip </template>
-    <template #subtitle>Letzte Position: <b>München Maxvorstadt</b></template>
+    <template #title>Johannes Trip</template>
+    <template #subtitle>Letzter Stop: <b>München Maxvorstadt</b></template>
+    <template #content>
+      <img
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4
+  //8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
+        alt="Red dot"
+      />
+    </template>
   </Modal>
 </template>
 

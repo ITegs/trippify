@@ -1,3 +1,7 @@
+$fa-font-path: './fonts/fontawesome-pro/webfonts/';
+@import './fonts/fontawesome-pro/scss/fontawesome.scss';
+@import './fonts/fontawesome-pro/scss/solid.scss';
+
 @font-face {
   font-family: 'Arvo';
   src: url('../assets/fonts/Arvo/Arvo-Regular.ttf') format('truetype');
