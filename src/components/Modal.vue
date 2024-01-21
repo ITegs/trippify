@@ -47,6 +47,7 @@ var isOpen = ref(false)
   width: 100%;
 
   transition: height 0.5s ease-in-out;
+  overflow-y: hidden;
 
   .title {
     width: 100%;
@@ -71,7 +72,7 @@ var isOpen = ref(false)
     font-size: 0.75rem;
   }
 
-  ::v-deep b {
+  :deep(b) {
     color: var(--color-primary);
   }
 
