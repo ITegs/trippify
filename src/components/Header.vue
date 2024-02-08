@@ -6,7 +6,7 @@
 h1 {
   display: flex;
   align-items: center;
-  height: 5vh;
+  height: 5dvh;
   padding-left: 1rem;
 
   font-family: Arvo;
