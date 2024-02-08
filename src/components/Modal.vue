@@ -7,6 +7,14 @@
     }"
   >
     <div class="head">
+      <i
+        class="fas fa-chevron-up"
+        @click="isOpen = !isOpen"
+        :style="{
+          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+        }"
+        style="transition: all 0.3s ease"
+      />
       <div class="title">
         <h1>
           <slot name="title" />
@@ -17,15 +25,6 @@
       <h2>
         <slot name="subtitle" />
       </h2>
-
-      <i
-        class="fas fa-chevron-up"
-        @click="isOpen = !isOpen"
-        :style="{
-          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
-        }"
-        style="transition: all 0.3s ease"
-      />
     </div>
 
     <div
@@ -96,10 +95,6 @@ var isOpen = ref(false)
 
     :deep(b) {
       color: var(--color-primary);
-    }
-
-    i {
-      padding: 0.5rem;
     }
   }
 
