@@ -1,0 +1,19 @@
+{
+  "short_name": "trippify",
+  "name": "trippify",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "64x64 32x32 24x24 16x16"
+    },
+    {
+      "src": "tapIcon.png",
+      "type": "image/png",
+      "sizes": "480x480"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#f8fcfa",
+  "background_color": "#f8fcfa"
+}
