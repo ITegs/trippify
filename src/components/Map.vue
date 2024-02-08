@@ -7,8 +7,9 @@ import { onMounted } from 'vue'
 import L from 'leaflet'
 
 onMounted(() => {
-  const map = L.map('map').setView([51.505, -0.09], 13)
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  const initialView: L.LatLngExpression = [48.13807, 11.57523]
+  const map = L.map('map').setView(initialView, 13)
+  L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '© OpenStreetMap contributors'
   }).addTo(map)
@@ -19,7 +20,5 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-#map {
-  height: 95vh;
-}
+//
 </style>
