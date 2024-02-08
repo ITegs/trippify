@@ -6,10 +6,10 @@
       closed: !isOpen
     }"
   >
-    <div class="head">
+    <div id="head" v-drag="dragHandler">
       <i
         class="fas fa-chevron-up"
-        @click="isOpen = !isOpen"
+        @click="isOpen ? closeModal() : openModal()"
         :style="{
           transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
         }"
@@ -42,8 +42,37 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import WeatherChip from './WeatherChip.vue'
+import { useDrag } from '@vueuse/gesture'
 
 var isOpen = ref(false)
+
+function openModal() {
+  isOpen.value = true
+}
+
+function closeModal() {
+  isOpen.value = false
+}
+
+const dragHandler = ({ movement: [, y], dragging }: any) => {
+  if (dragging) {
+    console.log(y)
+
+    if (y < -50) {
+      openModal()
+    } else if (y > 50) {
+      closeModal()
+    }
+  }
+}
+
+useDrag(dragHandler, {
+  filterTaps: true,
+  preventWindowScrollY: true,
+  useTouch: true,
+  axis: 'y',
+  domTarget: document.getElementById('head')
+})
 </script>
 
 <style scoped lang="scss">
@@ -62,7 +91,7 @@ var isOpen = ref(false)
   border-radius: 20px 20px 0 0;
   overflow-y: hidden;
 
-  .head {
+  #head {
     width: 100%;
     height: 12vh;
     display: flex;
