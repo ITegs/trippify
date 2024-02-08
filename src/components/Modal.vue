@@ -6,26 +6,37 @@
       closed: !isOpen
     }"
   >
-    <div class="title">
-      <h1>
-        <slot name="title" />
-      </h1>
-      <WeatherChip :temperature="1" condition="sunny" class="weather-chip" />
+    <div class="head">
+      <div class="title">
+        <h1>
+          <slot name="title" />
+        </h1>
+        <WeatherChip :temperature="1" condition="sunny" class="weather-chip" />
+      </div>
+
+      <h2>
+        <slot name="subtitle" />
+      </h2>
+
+      <i
+        class="fas fa-chevron-up"
+        @click="isOpen = !isOpen"
+        :style="{
+          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+        }"
+        style="transition: all 0.3s ease"
+      />
     </div>
-    <h2>
-      <slot name="subtitle" />
-    </h2>
 
-    <i
-      class="fas fa-chevron-up"
-      @click="isOpen = !isOpen"
+    <div
+      class="content"
       :style="{
-        transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+        paddingTop: !isOpen ? '10vh' : '0',
+        opacity: isOpen ? '1' : '0'
       }"
-      style="transition: all 0.3s ease"
-    />
-
-    <slot v-if="isOpen" name="content" />
+    >
+      <slot name="content" />
+    </div>
   </div>
 </template>
 
@@ -37,55 +48,74 @@ var isOpen = ref(false)
 </script>
 
 <style scoped lang="scss">
-#modal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-block: 1rem;
-  border-radius: 20px 20px 0 0;
-  background-color: var(--color-background);
-  width: 100%;
-
-  transition: height 0.5s ease-in-out;
-  overflow-y: hidden;
-
-  .title {
-    width: 100%;
-    display: flex;
-
-    h1 {
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: Arvo;
-      font-size: 1.5rem;
-      font-weight: 900;
-    }
-
-    .weather-chip {
-      margin-left: auto;
-      margin-right: 1rem;
-    }
-  }
-
-  h2 {
-    font-size: 0.75rem;
-  }
-
-  :deep(b) {
-    color: var(--color-primary);
-  }
-
-  i {
-    padding: 1rem;
-  }
-}
-
 .open {
-  height: 70vh;
+  height: 65vh;
 }
 
 .closed {
-  height: 8rem;
+  height: 15vh;
+}
+
+#modal {
+  background-color: var(--color-background);
+  width: 100%;
+  transition: height 0.5s ease-in-out;
+  border-radius: 20px 20px 0 0;
+  overflow-y: hidden;
+
+  .head {
+    width: 100%;
+    height: 12vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1rem;
+
+    .title {
+      width: 100%;
+      display: flex;
+
+      h1 {
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: Arvo;
+        font-size: 1.5rem;
+        font-weight: 900;
+      }
+
+      .weather-chip {
+        margin-left: auto;
+        margin-right: 1rem;
+      }
+    }
+
+    h2 {
+      font-size: 0.75rem;
+    }
+
+    :deep(b) {
+      color: var(--color-primary);
+    }
+
+    i {
+      padding: 0.5rem;
+    }
+  }
+
+  .content {
+    height: 53vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+    transition: all 0.5s ease-in-out;
+
+    :deep(img) {
+      width: 80%;
+      border-radius: 20px;
+    }
+  }
 }
 </style>
