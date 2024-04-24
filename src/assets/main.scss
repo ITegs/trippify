@@ -1,5 +1,12 @@
 @import './base.scss';
 
+// Disables safari's elastic scroll
+html,
+body {
+  position: fixed;
+  overflow: hidden;
+}
+
 #app {
   max-width: 1280px;
   font-weight: normal;

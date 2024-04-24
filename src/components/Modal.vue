@@ -6,7 +6,13 @@
       closed: !isOpen
     }"
   >
-    <div id="head" v-drag="dragHandler">
+    <div
+      id="head"
+      v-drag="dragHandler"
+      :style="{
+        boxShadow: isOpen ? '0 0 10px 0 rgba(0, 0, 0, 0.1)' : 'none'
+      }"
+    >
       <i
         class="fas fa-chevron-up"
         @click="isOpen ? closeModal() : openModal()"
@@ -56,8 +62,6 @@ function closeModal() {
 
 const dragHandler = ({ movement: [, y], dragging }: any) => {
   if (dragging) {
-    console.log(y)
-
     if (y < -50) {
       openModal()
     } else if (y > 50) {
@@ -129,17 +133,9 @@ useDrag(dragHandler, {
 
   .content {
     height: 53vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 1rem;
+    padding-block: 2rem;
     overflow-y: auto;
     transition: all 0.5s ease-in-out;
-
-    :deep(img) {
-      width: 80%;
-      border-radius: 20px;
-    }
   }
 }
 </style>
