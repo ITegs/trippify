@@ -1,0 +1,26 @@
+version: "3"
+name: trippify
+
+services:
+  mongodb:
+    image: mongo:latest
+    command: --quiet --logpath /dev/null
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb-data:/data/db:rw
+
+  apiserver:
+    build:
+      context: ./backend
+      target: hot-reload
+    command: '-build="sleep 3 && go build -o /build/apiserver cmd/apiserver/main.go" -command="/build/apiserver" -log-prefix=false'
+    volumes:
+      - ./backend:/app:ro
+    depends_on:
+      - mongodb
+    ports:
+      - 80:80
+
+volumes:
+  mongodb-data:
