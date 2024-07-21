@@ -17,8 +17,7 @@ const exampleData = [
   {
     id: 1,
     img: 'https://trip.jo-dev.de/api/img/2022-08-20T19:04:41.899Z.jpg',
-    description:
-      'Die Wanderung beginnt am späten Nachmittag, als wir uns auf den Weg machen, um den Gipfel des Berges zu erreichen, rechtzeitig zum Sonnenuntergang. Mit jedem Schritt auf dem steinigen Pfad steigt die Vorfreude, das Naturschauspiel aus der besten Perspektive zu erleben. Als wir den Gipfel erreichen, breitet sich vor uns ein atemberaubender Anblick aus: Der Himmel färbt sich in leuchtenden Orangetönen, die sich im Kontrast zum tiefblauen Horizont abzeichnen. Die letzten Sonnenstrahlen tauchen die umliegende Landschaft in ein goldenes Licht, und die Stille auf dem Gipfel lässt uns den Moment in völliger Ruhe genießen. Während die Sonne langsam hinter den fernen Bergen versinkt, fühlen wir uns erfüllt und dankbar für die Schönheit der Natur, die uns für einen kurzen Moment alles um uns herum vergessen lässt.'
+    description: 'Das Jedermannsrecht wurde ausgenutzt! 🌄🏕️'
   },
   {
     id: 2,

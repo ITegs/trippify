@@ -38,4 +38,18 @@ const dateTo: Ref<Date | null> = ref(null)
 
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
+
+@media screen and (min-width: 1000px) {
+  #modal {
+    width: 40%;
+
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    transform: translateX(-20%);
+    z-index: 999;
+
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+}
 </style>
