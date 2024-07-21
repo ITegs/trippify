@@ -13,24 +13,33 @@
         boxShadow: isOpen ? '0 0 10px 0 rgba(0, 0, 0, 0.1)' : 'none'
       }"
     >
-      <i
-        class="fas fa-chevron-up"
-        @click="isOpen ? closeModal() : openModal()"
-        :style="{
-          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
-        }"
-        style="transition: all 0.3s ease"
-      />
+      <span class="pull-line" />
+
       <div class="title">
-        <h1>
-          <slot name="title" />
-        </h1>
-        <WeatherChip :temperature="1" condition="sunny" class="weather-chip" />
+        <p>{{ pretitle }}</p>
+
+        <h1>{{ title }}</h1>
+
+        <div v-if="duration !== 0" style="justify-self: right">
+          <p v-if="!dateTo">{{ dateFrom.toLocaleDateString('de-DE') }} - Heute</p>
+          <p v-else>
+            {{ dateFrom.toLocaleDateString('de-DE') }} - {{ dateTo.toLocaleDateString('de-DE') }}
+          </p>
+        </div>
+        <div v-else style="justify-self: right">
+          <p>Am</p>
+        </div>
+
+        <div v-if="duration !== 0" style="justify-self: right">
+          <h2 v-if="duration === 1">1 Tag</h2>
+          <h2 v-else>{{ duration }} Tage</h2>
+        </div>
+        <div v-else style="justify-self: right">
+          <h2>{{ dateFrom.toLocaleDateString('de-DE') }}</h2>
+        </div>
       </div>
 
-      <h2>
-        <slot name="subtitle" />
-      </h2>
+      <h2 id="isCurrent" v-if="!dateTo">Aktueller Ort</h2>
     </div>
 
     <div
@@ -46,9 +55,24 @@
 </template>
 
 <script setup lang="ts">
+const props = defineProps<{
+  pretitle: String
+  title: String
+  dateFrom: Date
+  dateTo: Date | null
+}>()
+
 import { ref } from 'vue'
 import WeatherChip from './WeatherChip.vue'
 import { useDrag } from '@vueuse/gesture'
+
+const today = new Date()
+let duration = 0
+if (props.dateTo) {
+  duration = Math.floor((props.dateTo.getTime() - props.dateFrom.getTime()) / (1000 * 60 * 60 * 24))
+} else {
+  duration = Math.floor((today.getTime() - props.dateFrom.getTime()) / (1000 * 60 * 60 * 24))
+}
 
 var isOpen = ref(false)
 
@@ -81,53 +105,73 @@ useDrag(dragHandler, {
 
 <style scoped lang="scss">
 .open {
-  height: 65vh;
+  height: calc(100dvh - 5dvh - 200px);
 }
 
 .closed {
-  height: 15vh;
+  height: 18dvh;
 }
 
 #modal {
   background-color: var(--color-background);
-  width: 100%;
   transition: height 0.5s ease-in-out;
   border-radius: 20px 20px 0 0;
   overflow-y: hidden;
 
   #head {
     width: 100%;
-    height: 12vh;
+    // height: 16vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding-top: 1rem;
+    padding-bottom: 0.5rem;
+
+    .pull-line {
+      height: 4px;
+      width: 60px;
+      border-radius: 5px;
+      background-color: #dbdbdb;
+    }
 
     .title {
       width: 100%;
-      display: flex;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      grid-auto-flow: column;
+      align-items: end;
+      padding-inline: 1rem;
+
+      p {
+        color: var(--color-text-light);
+        font-size: 0.8rem;
+        white-space: nowrap;
+      }
 
       h1 {
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
+        color: var(--color-text);
+        font-family: Arvo;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: scroll;
+        font-size: 1.7rem;
+      }
+
+      h2 {
+        color: var(--color-primary);
         font-family: Arvo;
         font-size: 1.5rem;
-        font-weight: 900;
-      }
-
-      .weather-chip {
-        margin-left: auto;
-        margin-right: 1rem;
       }
     }
 
-    h2 {
-      font-size: 0.75rem;
-    }
-
-    :deep(b) {
+    #isCurrent {
       color: var(--color-primary);
+      font-size: 0.75rem;
+      align-self: flex-start;
+      padding-left: 1rem;
+      position: relative;
+      top: -0.2rem;
     }
   }
 

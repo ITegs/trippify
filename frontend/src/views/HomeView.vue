@@ -1,10 +1,6 @@
 <template>
   <Map id="map" />
-  <Modal id="modal">
-    <template #title>{{ title }}</template>
-    <template #subtitle>
-      <span v-html="subtitle" />
-    </template>
+  <Modal id="modal" :pretitle="pretitle" :title="title" :dateFrom="dateFrom" :dateTo="dateTo">
     <template #content>
       <TripCarousel />
     </template>
@@ -12,14 +8,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
 
 import Map from '@/components/Map.vue'
 import Modal from '@/components/Modal.vue'
 import TripCarousel from '@/components/TripCarousel.vue'
 
-const title = ref('Johannes Trip')
-const subtitle = ref('to the <b>moon</b>! &#128640;')
+const pretitle: Ref<String> = ref('55°29′N 8°27′E')
+const title: Ref<String> = ref('Malmö')
+const dateFrom: Ref<Date> = ref(new Date(Date.parse('2024-07-18')))
+const dateTo: Ref<Date | null> = ref(null)
+// const dateTo: Ref<Date | null> = ref(new Date(Date.parse('2024-07-24')))
 </script>
 
 <style scoped lang="scss">
@@ -29,8 +28,14 @@ const subtitle = ref('to the <b>moon</b>! &#128640;')
 }
 
 #modal {
+  width: 95%;
+
   position: absolute;
   bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 999;
+
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 </style>

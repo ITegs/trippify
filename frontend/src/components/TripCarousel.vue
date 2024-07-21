@@ -48,10 +48,9 @@ const exampleData = [
   }
 
   p {
-    margin: 20px;
     text-align: justify;
     font-size: 1.2rem;
-    font-family: 'Arvo';
+    margin: 1rem;
   }
 }
 </style>

@@ -14,6 +14,7 @@ $fa-font-path: './fonts/fontawesome-pro/webfonts/';
 
 :root {
   --text-light: #0c1d16;
+  --text-bright-light: #abb9b3;
   --background-light: #f8fcfa;
   --primary-light: #5dbb93;
   --secondary-light: #9dcdb5;
@@ -29,6 +30,7 @@ $fa-font-path: './fonts/fontawesome-pro/webfonts/';
 /* semantic color variables for this project */
 :root {
   --color-text: var(--text-light);
+  --color-text-light: var(--text-bright-light);
   --color-background: var(--background-light);
   --color-primary: var(--primary-light);
   --color-secondary: var(--secondary-light);
