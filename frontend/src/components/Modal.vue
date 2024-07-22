@@ -1,16 +1,18 @@
 <template>
   <div
     id="modal"
+    :style="{ top: yPos + 'px' }"
     :class="{
-      open: isOpen,
-      closed: !isOpen
+      closed: modalState === ModalState.closed,
+      half: modalState === ModalState.half,
+      full: modalState === ModalState.full
     }"
   >
     <div
       id="head"
       v-drag="dragHandler"
       :style="{
-        boxShadow: isOpen ? '0 0 10px 0 rgba(0, 0, 0, 0.1)' : 'none'
+        boxShadow: modalState !== ModalState.closed ? '0 0 10px 0 rgba(0, 0, 0, 0.1)' : 'none'
       }"
     >
       <span class="pull-line" />
@@ -45,8 +47,8 @@
     <div
       class="content"
       :style="{
-        paddingTop: !isOpen ? '10vh' : '0',
-        opacity: isOpen ? '1' : '0'
+        paddingTop: !modalState ? '10vh' : '0',
+        opacity: modalState ? '1' : '0'
       }"
     >
       <slot name="content" />
@@ -62,7 +64,7 @@ const props = defineProps<{
   dateTo: Date | null
 }>()
 
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
 import WeatherChip from './WeatherChip.vue'
 import { useDrag } from '@vueuse/gesture'
 
@@ -74,24 +76,96 @@ if (props.dateTo) {
   duration = Math.floor((today.getTime() - props.dateFrom.getTime()) / (1000 * 60 * 60 * 24))
 }
 
-var isOpen = ref(false)
-
-function openModal() {
-  isOpen.value = true
+enum ModalState {
+  'closed',
+  'half',
+  'full'
 }
 
-function closeModal() {
-  isOpen.value = false
-}
+const windowHeigth = window.screen.availHeight
+var yPos = ref(windowHeigth - 150)
+let lastY = yPos.value
+
+var modalState: Ref<ModalState> = ref(ModalState.closed)
 
 const dragHandler = ({ movement: [, y], dragging }: any) => {
   if (dragging) {
-    if (y < -50) {
-      openModal()
-    } else if (y > 50) {
-      closeModal()
+    if (yPos.value + y > 40 && yPos.value + y < windowHeigth - 60) {
+      yPos.value = y + lastY
+    }
+  } else {
+    lastY = yPos.value
+    console.log('Updated: ' + lastY)
+
+    switch (modalState.value) {
+      case ModalState.closed:
+        if (lastY < windowHeigth / 2) {
+          fullModal()
+        } else if (lastY > windowHeigth - 250) {
+          closeModal()
+        } else {
+          halfModal()
+        }
+        break
+
+      case ModalState.half:
+        if (lastY < windowHeigth / 2 - 150) {
+          fullModal()
+        } else if (lastY > windowHeigth / 2 - 50) {
+          closeModal()
+        } else {
+          halfModal()
+        }
+        break
+
+      case ModalState.full:
+        if (lastY > windowHeigth / 2 - 150) {
+          closeModal()
+        } else if (lastY > windowHeigth / 2 - 250) {
+          halfModal()
+        } else {
+          fullModal()
+        }
+        break
     }
   }
+}
+
+function closeModal() {
+  modalState.value = ModalState.closed
+  console.log('CLOSE')
+  animateModalScroll(windowHeigth - 170)
+}
+
+function halfModal() {
+  modalState.value = ModalState.half
+  console.log('HALF')
+  animateModalScroll(250)
+}
+
+function fullModal() {
+  modalState.value = ModalState.full
+  console.log('FULL')
+  animateModalScroll(60)
+}
+
+function animateModalScroll(to: number) {
+  const scrollLength = Math.abs(yPos.value - to)
+
+  const animationDurationMs = 200
+  const stepSize = scrollLength / animationDurationMs
+
+  for (let i = 0; i < animationDurationMs; i++) {
+    setTimeout(() => {
+      if (yPos.value < to) {
+        yPos.value += stepSize
+      } else {
+        yPos.value -= stepSize
+      }
+    }, i)
+  }
+
+  lastY = to
 }
 
 useDrag(dragHandler, {
@@ -104,12 +178,22 @@ useDrag(dragHandler, {
 </script>
 
 <style scoped lang="scss">
-.open {
-  height: calc(100dvh - 5dvh - 200px);
+.closed {
 }
 
-.closed {
-  height: 18dvh;
+.half {
+}
+
+.full,
+.half {
+  #head {
+    .title {
+      grid-template-rows: 1fr !important;
+      p {
+        display: none;
+      }
+    }
+  }
 }
 
 #modal {
@@ -117,6 +201,7 @@ useDrag(dragHandler, {
   transition: height 0.5s ease-in-out;
   border-radius: 20px 20px 0 0;
   overflow-y: hidden;
+  position: relative;
 
   #head {
     width: 100%;
