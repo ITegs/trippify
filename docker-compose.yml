@@ -10,17 +10,17 @@ services:
     volumes:
       - mongodb-data:/data/db:rw
 
-  apiserver:
+  main:
     build:
       context: ./backend
       target: hot-reload
-    command: '-build="sleep 3 && go build -o /build/apiserver cmd/apiserver/main.go" -command="/build/apiserver" -log-prefix=false'
+    command: '-build="sleep 3 && go build -o /build main.go" -command="/build/main" -log-prefix=false'
     volumes:
       - ./backend:/app:ro
     depends_on:
       - mongodb
     ports:
-      - 80:80
+      - "8000:8000"
 
 volumes:
   mongodb-data:

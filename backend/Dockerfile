@@ -32,8 +32,10 @@
     # Build all binaries and make them available in the /build directory. The final
     # image layer will copy them from there.
     COPY . .
-    RUN go build -o /build/apiserver cmd/apiserver/main.go    
-    
+    RUN go build -o /build main.go
+    RUN go build -o /build/apiserver apiserver/apiserver.go
+    RUN go build -o /build/database database/database.go
+
     # +-----------------------------------------------------------------------------
     # | Assemble the final image, which doesn't need the source code or golang
     # +-----------------------------------------------------------------------------
@@ -44,4 +46,6 @@
     WORKDIR /app
     
     # Copy the compiled binaries from the builder image
-    COPY --from=builder /build/* /usr/local/bin/
+    COPY --from=builder /build/* /app/main
+
+    ENTRYPOINT ["/app/main"]
