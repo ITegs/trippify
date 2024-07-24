@@ -1,0 +1,200 @@
+openapi: 3.0.1
+info:
+  title: trippify API
+  description: trippify API
+  version: 1.0.0
+servers:
+  - url: "http://localhost:80"
+    description: "Local development server"
+paths:
+  /api/user/{username}:
+    get:
+      operationId: user.get
+      summary: Get the user with the given username
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: The username of the user
+          schema:
+            $ref: "#/components/schemas/Username"
+      responses:
+        200:
+          description: The requested user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        404:
+          $ref: "#/components/responses/ErrorResponse"
+  /api/newUser:
+    post:
+      operationId: newUser.post
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        201:
+          description: The user has been created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /api/trip/{tripId}:
+    post:
+      operationId: trip.get
+      summary: Get the trip with the given id
+      parameters:
+        - name: tripId
+          in: path
+          required: true
+          description: The id of the trip
+          schema:
+            $ref: "#/components/schemas/ObjectId"
+      responses:
+        200:
+          description: The requested trip
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Trip"
+        404:
+          $ref: "#/components/responses/ErrorResponse"
+  /api/newTrip:
+    post:
+      operationId: newTrip.post
+      summary: Create a new trip
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Trip"
+      responses:
+        201:
+          description: The trip has been created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Trip"
+  /api/trip/{tripId}/spot/add:
+    post:
+      operationId: addSpotToTrip.post
+      summary: Add a spot to a given trip
+      parameters:
+        - name: tripId
+          in: path
+          required: true
+          description: The id of the trip
+          schema:
+            $ref: "#/components/schemas/ObjectId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Spot"
+      responses:
+        201:
+          description: The spot has been added to the trip
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Trip"
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - name
+      properties:
+        username:
+          $ref: "#/components/schemas/Username"
+        name:
+          type: string
+        trips:
+          type: array
+          items:
+            $ref: "#/components/schemas/ObjectId"
+    Username:
+      type: string
+      pattern: "^[a-z0-9.]+$"
+    Trip:
+      type: object
+      required:
+        - owner
+        - title
+      properties:
+        owner:
+          $ref: "#/components/schemas/ObjectId"
+        title:
+          type: string
+        start_date:
+          type: string
+        spots:
+          type: array
+          items:
+            $ref: "#/components/schemas/Spot"
+    Spot:
+      type: object
+      required:
+        - title
+        - longitude
+        - latitude
+        - images
+      properties:
+        title:
+          type: string
+        longitude:
+          type: number
+        latitude:
+          type: number
+        images:
+          type: array
+          items:
+            $ref: "#/components/schemas/Image"
+    Image:
+      type: object
+      required:
+        - source
+      properties:
+        source:
+          type: string
+        description:
+          type: string
+    ObjectId:
+      description: A MongoDB ObjectId
+      type: string
+      pattern: "^[a-fA-F0-9]{24}$"
+    Error:
+      type: object
+      required:
+        - message
+        - code
+      properties:
+        message:
+          description: A human readable error message
+          type: string
+        code:
+          $ref: "#/components/schemas/ErrorCode"
+    ErrorCode:
+      type: string
+      enum:
+        - server_error
+    Timestamp:
+      type: string
+      format: iso8601
+  responses:
+    ErrorResponse:
+      description: Error Response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

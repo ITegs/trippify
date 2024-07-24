@@ -24,7 +24,7 @@ type Trip struct {
 
 type image struct {
 	Source      string `json:"source,omitempty" bson:"source"`
-	Description string `json:"description,omitempty" bson:"description"`
+	Description string `json:"description" bson:"description"`
 }
 
 type Spot struct {

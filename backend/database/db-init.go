@@ -23,7 +23,7 @@ func initializeDB(db *mongo.Database) {
 			},
 			"username": bson.M{
 				"bsonType": "string",
-				"pattern":  "^[a-z0-9\\.\\-]+$",
+				"pattern":  "^[a-z0-9.]+$",
 			},
 			"name": bson.M{
 				"bsonType": "string",

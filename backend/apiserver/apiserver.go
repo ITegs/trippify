@@ -32,7 +32,7 @@ func (api *apiServer) Main() {
 	apiHandler := api.buildApi()
 
 	server := http.Server{
-		Addr:    ":8000",
+		Addr:    ":80",
 		Handler: apiHandler,
 	}
 
@@ -62,7 +62,7 @@ func (api *apiServer) buildApi() *httprouter.Router {
 		},
 		{
 			Method:  http.MethodGet,
-			Path:    "/trip/:id",
+			Path:    "/trip/:tripId",
 			Handler: http.HandlerFunc(api.GetTrip),
 		},
 		{
@@ -72,14 +72,14 @@ func (api *apiServer) buildApi() *httprouter.Router {
 		},
 		{
 			Method:  http.MethodPost,
-			Path:    "/trip/:id/spot/add",
+			Path:    "/trip/:tripId/spot/add",
 			Handler: http.HandlerFunc(api.AddSpotToTrip),
 		},
 	}
 
 	for i := 0; i < len(routes); i++ {
 		r := routes[i]
-		router.Handler(r.Method, r.Path, r.Handler)
+		router.Handler(r.Method, "/api"+r.Path, r.Handler)
 	}
 
 	return router
@@ -125,12 +125,13 @@ func (api *apiServer) NewUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	// TODO: Return the user
 	return
 }
 
 func (api *apiServer) GetTrip(w http.ResponseWriter, r *http.Request) {
 	p := httprouter.ParamsFromContext(r.Context())
-	tripId := p.ByName("id")
+	tripId := p.ByName("tripId")
 
 	trip, err := api.db.GetTrip(tripId)
 	if err != nil {
@@ -170,12 +171,13 @@ func (api *apiServer) NewTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	// TODO: return the trip
 	return
 }
 
 func (api *apiServer) AddSpotToTrip(w http.ResponseWriter, r *http.Request) {
 	p := httprouter.ParamsFromContext(r.Context())
-	tripId := p.ByName("id")
+	tripId := p.ByName("tripId")
 
 	var spot database.Spot
 	err := json.NewDecoder(r.Body).Decode(&spot)
