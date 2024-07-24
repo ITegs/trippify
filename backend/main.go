@@ -4,10 +4,16 @@ import (
 	"fmt"
 	"github.com/ITegs/trippify/apiserver"
 	"github.com/ITegs/trippify/database"
+	"os"
 )
 
 func main() {
 	fmt.Println("Welcome to trippify!")
+
+	if len(os.Args) > 1 && os.Args[1] == "migrate" {
+		database.RunMigrations("trippify")
+		return
+	}
 
 	users, err := database.CollectionFactory("trippify", "users")
 	if err != nil {
@@ -21,6 +27,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+
 	db := database.NewDB(users, trips)
 
 	api := apiserver.NewApiServer(db)

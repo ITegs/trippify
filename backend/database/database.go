@@ -10,7 +10,9 @@ import (
 )
 
 type User struct {
-	Name string `json:"name,omitempty" bson:"name"`
+	Username string               `json:"username,omitempty" bson:"username"`
+	Name     string               `json:"name,omitempty" bson:"name"`
+	Trips    []primitive.ObjectID `json:"trips" bson:"trips"`
 }
 
 type Trip struct {
@@ -58,7 +60,9 @@ type db struct {
 }
 
 type DB interface {
+	GetUser(username string) (*User, error)
 	NewUser(user *User) error
+	GetTrip(tripId string) (*Trip, error)
 	NewTrip(trip *Trip) error
 	AddSpotToTrip(tripId string, spot Spot) error
 }
@@ -88,6 +92,24 @@ func CollectionFactory(databaseName string, collectionName string) (*mongo.Colle
 	return database.Collection(collectionName), nil
 }
 
+func RunMigrations(databaseName string) {
+	database := mCl.Database(databaseName)
+	initializeDB(database)
+}
+
+func (db *db) GetUser(username string) (*User, error) {
+	result := db.users.FindOne(context.TODO(), bson.D{{"username", username}})
+
+	var user User
+
+	err := result.Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 func (db *db) NewUser(user *User) error {
 	result, err := db.users.InsertOne(context.TODO(), user)
 	if err != nil {
@@ -97,12 +119,45 @@ func (db *db) NewUser(user *User) error {
 	return nil
 }
 
+func (db *db) GetTrip(id string) (*Trip, error) {
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(objectId)
+
+	result := db.trips.FindOne(context.TODO(), bson.D{{"_id", objectId}})
+
+	var trip Trip
+
+	err = result.Decode(&trip)
+	if err != nil {
+		return nil, err
+	}
+
+	return &trip, nil
+}
+
 func (db *db) NewTrip(trip *Trip) error {
-	result, err := db.trips.InsertOne(context.TODO(), trip)
+	tripResult, err := db.trips.InsertOne(context.TODO(), trip)
 	if err != nil {
 		return err
 	}
-	fmt.Println("Inserted a new trip: ", result.InsertedID)
+	fmt.Println("Inserted a new trip: ", tripResult.InsertedID)
+
+	filter := bson.D{{"_id", trip.Owner}}
+	update := bson.D{
+		{"$push", bson.D{
+			{"trips", tripResult.InsertedID},
+		}},
+	}
+	userResult, err := db.users.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Added the trip to the user: ", userResult.UpsertedID)
+
 	return nil
 }
 
