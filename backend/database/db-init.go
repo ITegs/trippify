@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"os"
 )
 
 func initializeDB(db *mongo.Database) {
@@ -15,10 +16,14 @@ func initializeDB(db *mongo.Database) {
 	userJsonSchema := bson.M{
 		"bsonType": "object",
 		"title":    "user",
-		"required": []string{"_id", "Name"},
+		"required": []string{"_id", "username", "name"},
 		"properties": bson.M{
 			"_id": bson.M{
 				"bsonType": "objectId",
+			},
+			"username": bson.M{
+				"bsonType": "string",
+				"pattern":  "^[a-z0-9\\.\\-]+$",
 			},
 			"name": bson.M{
 				"bsonType": "string",
@@ -40,7 +45,23 @@ func initializeDB(db *mongo.Database) {
 
 	err := db.CreateCollection(context.TODO(), "users", userOpts)
 	if err != nil {
-		fmt.Println("Failed to create collection users")
+		fmt.Println("Failed to create collection users: ", err)
+		os.Exit(1)
+		return
+	}
+
+	// Create a unique index on the username field
+	usersCollection := db.Collection("users")
+
+	indexModel := mongo.IndexModel{
+		Keys:    bson.D{{Key: "username", Value: 1}},
+		Options: options.Index().SetUnique(true),
+	}
+
+	_, err = usersCollection.Indexes().CreateOne(context.TODO(), indexModel)
+	if err != nil {
+		fmt.Println("Failed to create unique index on username:", err)
+		os.Exit(1)
 		return
 	}
 
@@ -106,7 +127,8 @@ func initializeDB(db *mongo.Database) {
 
 	err = db.CreateCollection(context.TODO(), "trips", tripOpts)
 	if err != nil {
-		fmt.Println("Failed to create collection trips")
+		fmt.Println("Failed to create collection trips: ", err)
+		os.Exit(1)
 		return
 	}
 
