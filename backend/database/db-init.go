@@ -3,10 +3,11 @@ package database
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
 )
 
 func initializeDB(db *mongo.Database) {
@@ -77,44 +78,14 @@ func initializeDB(db *mongo.Database) {
 			"owner": bson.M{
 				"bsonType": "objectId",
 			},
-			"name": bson.M{
+			"title": bson.M{
 				"bsonType": "string",
 			},
 			"start_date": bson.M{
-				"bsonType": "date",
+				"bsonType": "string",
 			},
 			"end_date": bson.M{
-				"bsonType": "date",
-			},
-			"spots": bson.M{
-				"bsonType": "array",
-				"items": bson.M{
-					"bsonType": "object",
-					"properties": bson.M{
-						"spot_name": bson.M{
-							"bsonType": "string",
-						},
-						"latitude": bson.M{
-							"bsonType": "double",
-						},
-						"longitude": bson.M{
-							"bsonType": "double",
-						},
-						"images": bson.M{
-							"bsonType": "array",
-							"items": bson.M{
-								"bsonType": "object",
-								"properties": bson.M{
-									"source": bson.M{
-										"bsonType": "string",
-									},
-									"description": bson.M{
-										"bsonType": "string",
-									},
-								},
-							}},
-					},
-				},
+				"bsonType": "string",
 			},
 		},
 	}
@@ -132,6 +103,64 @@ func initializeDB(db *mongo.Database) {
 		return
 	}
 
-	fmt.Println("Migration succeeded")
+	// SPOTS collection
+	spotJsonSchema := bson.M{
+		"bsonType": "object",
+		"title":    "trip",
+		"required": []string{"_id", "roadtripId", "title", "date_from"},
+		"properties": bson.M{
+			"_id": bson.M{
+				"bsonType": "objectId",
+			},
+			"roadtripId": bson.M{
+				"bsonType": "objectId",
+			},
+			"title": bson.M{
+				"bsonType": "string",
+			},
+			"longitude": bson.M{
+				"bsonType": "long",
+			},
+			"latitude": bson.M{
+				"bsonType": "long",
+			},
+			"date_from": bson.M{
+				"bsonType": "string",
+			},
+			"date_to": bson.M{
+				"bsonType": "string",
+			},
+			"description": bson.M{
+				"bsonType": "string",
+			},
+			"images": bson.M{
+				"bsonType": "array",
+				"items": bson.M{
+					"bsonType": "object",
+					"properties": bson.M{
+						"source": bson.M{
+							"bsonType": "string",
+						},
+						"timestamp": bson.M{
+							"bsonType": "int",
+						},
+					},
+				}},
+		},
+	}
 
+	spotValidator := bson.M{
+		"$jsonSchema": spotJsonSchema,
+	}
+
+	spotOpts := options.CreateCollection().SetValidator(spotValidator)
+
+	err = db.CreateCollection(context.TODO(), "spots", spotOpts)
+	if err != nil {
+		fmt.Println("Failed to create collection spots: ", err)
+		os.Exit(1)
+		return
+	}
+
+	fmt.Println("Migration succeeded")
 }

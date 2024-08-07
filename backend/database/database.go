@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,20 +19,24 @@ type User struct {
 type Trip struct {
 	Owner     primitive.ObjectID `json:"owner,omitempty" bson:"owner"`
 	Title     string             `json:"title,omitempty" bson:"title"`
-	StartDate primitive.DateTime `json:"start_date" bson:"start_date"`
-	Spots     []Spot             `json:"spots" bson:"spots"`
+	StartDate string             `json:"start_date" bson:"start_date"`
+	EndDate   string             `json:"end_date" bson:"end_date"`
 }
 
 type image struct {
-	Source      string `json:"source,omitempty" bson:"source"`
-	Description string `json:"description" bson:"description"`
+	Source    string `json:"source,omitempty" bson:"source"`
+	Timestamp int32  `json:"timestamp" bson:"timestamp"`
 }
 
 type Spot struct {
-	Title     string  `json:"title,omitempty" bson:"title"`
-	Longitude float64 `json:"longitude,omitempty" bson:"longitude"`
-	Latitude  float64 `json:"latitude,omitempty" bson:"latitude"`
-	Images    []image `json:"images,omitempty" bson:"images"`
+	RoadtripId  primitive.ObjectID `json:"roadtripId,omitempty" bson:"roadtripId"`
+	Title       string             `json:"title,omitempty" bson:"title"`
+	Longitude   float64            `json:"longitude,omitempty" bson:"longitude"`
+	Latitude    float64            `json:"latitude,omitempty" bson:"latitude"`
+	Images      []image            `json:"images,omitempty" bson:"images"`
+	Description string             `json:"description" bson:"description"`
+	DateFrom    string             `json:"date_from" bson:"date_from"`
+	DateTo      string             `json:"date_to" bson:"date_to"`
 }
 
 var mCl *mongo.Client
@@ -98,7 +103,7 @@ func RunMigrations(databaseName string) {
 }
 
 func (db *db) GetUser(username string) (*User, error) {
-	result := db.users.FindOne(context.TODO(), bson.D{{"username", username}})
+	result := db.users.FindOne(context.TODO(), bson.D{{Key: "username", Value: username}})
 
 	var user User
 
@@ -125,9 +130,7 @@ func (db *db) GetTrip(id string) (*Trip, error) {
 		return nil, err
 	}
 
-	fmt.Println(objectId)
-
-	result := db.trips.FindOne(context.TODO(), bson.D{{"_id", objectId}})
+	result := db.trips.FindOne(context.TODO(), bson.D{{Key: "_id", Value: objectId}})
 
 	var trip Trip
 
@@ -146,12 +149,13 @@ func (db *db) NewTrip(trip *Trip) error {
 	}
 	fmt.Println("Inserted a new trip: ", tripResult.InsertedID)
 
-	filter := bson.D{{"_id", trip.Owner}}
+	filter := bson.D{{Key: "_id", Value: trip.Owner}}
 	update := bson.D{
-		{"$push", bson.D{
-			{"trips", tripResult.InsertedID},
+		{Key: "$push", Value: bson.D{
+			{Key: "trips", Value: tripResult.InsertedID},
 		}},
 	}
+
 	userResult, err := db.users.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		return err
@@ -162,15 +166,15 @@ func (db *db) NewTrip(trip *Trip) error {
 }
 
 func (db *db) AddSpotToTrip(tripId string, spot Spot) error {
-
 	objectId, err := primitive.ObjectIDFromHex(tripId)
 	if err != nil {
 		return fmt.Errorf("invalid trip ID format: %v", err)
 	}
-	filter := bson.D{{"_id", objectId}}
+
+	filter := bson.D{{Key: "_id", Value: objectId}}
 	update := bson.D{
-		{"$push", bson.D{
-			{"spots", spot},
+		{Key: "$push", Value: bson.D{
+			{Key: "spots", Value: spot},
 		}},
 	}
 

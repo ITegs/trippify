@@ -92,6 +92,7 @@ func (api *apiServer) GetUser(w http.ResponseWriter, r *http.Request) {
 	trip, err := api.db.GetUser(userId)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
 		return
 	}
 
@@ -103,6 +104,7 @@ func (api *apiServer) GetUser(w http.ResponseWriter, r *http.Request) {
 	err = encoder.Encode(trip)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(err)
 		return
 	}
 
@@ -114,6 +116,7 @@ func (api *apiServer) NewUser(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil || user.Name == "" {
 		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
 		return
 	}
 
@@ -136,16 +139,19 @@ func (api *apiServer) GetTrip(w http.ResponseWriter, r *http.Request) {
 	trip, err := api.db.GetTrip(tripId)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
+	w.Header().Add("Access-Control-Allow-Origin", "*") // TODO: Remove
 	w.WriteHeader(http.StatusOK)
 	encoder := json.NewEncoder(w)
 	encoder.SetEscapeHTML(false)
 
 	err = encoder.Encode(trip)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
@@ -157,11 +163,11 @@ func (api *apiServer) NewTrip(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&trip)
 	if err != nil || trip.Title == "" || trip.Owner == primitive.NilObjectID {
 		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
 		return
 	}
 
-	trip.StartDate = primitive.NewDateTimeFromTime(time.Now())
-	trip.Spots = []database.Spot{}
+	trip.StartDate = time.Now().Format(time.RFC3339)
 
 	err = api.db.NewTrip(&trip)
 	if err != nil {
@@ -183,6 +189,7 @@ func (api *apiServer) AddSpotToTrip(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&spot)
 	if err != nil || spot.Title == "" || len(spot.Images) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
 		return
 	}
 

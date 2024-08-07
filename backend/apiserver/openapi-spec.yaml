@@ -6,6 +6,7 @@ info:
 servers:
   - url: "http://localhost:80"
     description: "Local development server"
+
 paths:
   /api/user/{username}:
     get:
@@ -27,6 +28,7 @@ paths:
                 $ref: "#/components/schemas/User"
         404:
           $ref: "#/components/responses/ErrorResponse"
+
   /api/newUser:
     post:
       operationId: newUser.post
@@ -36,7 +38,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/NewUser"
       responses:
         201:
           description: The user has been created
@@ -44,8 +46,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+
   /api/trip/{tripId}:
-    post:
+    get:
       operationId: trip.get
       summary: Get the trip with the given id
       parameters:
@@ -64,6 +67,7 @@ paths:
                 $ref: "#/components/schemas/Trip"
         404:
           $ref: "#/components/responses/ErrorResponse"
+
   /api/newTrip:
     post:
       operationId: newTrip.post
@@ -73,7 +77,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Trip"
+              $ref: "#/components/schemas/NewTrip"
       responses:
         201:
           description: The trip has been created
@@ -81,6 +85,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Trip"
+
   /api/trip/{tripId}/spot/add:
     post:
       operationId: addSpotToTrip.post
@@ -97,21 +102,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Spot"
+              $ref: "#/components/schemas/NewSpot"
       responses:
         201:
           description: The spot has been added to the trip
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Trip"
+                $ref: "#/components/schemas/Spot"
 
 components:
   schemas:
-    User:
+    NewUser:
       type: object
       required:
-        - id
         - username
         - name
       properties:
@@ -119,35 +123,59 @@ components:
           $ref: "#/components/schemas/Username"
         name:
           type: string
+
+    User:
+      allOf:
+        - $ref: "#/components/schemas/NewUser"
+      type: object
+      required:
+        - _id
+      properties:
+        _id:
+          $ref: "#/components/schemas/ObjectId"
         trips:
           type: array
           items:
             $ref: "#/components/schemas/ObjectId"
+
     Username:
       type: string
       pattern: "^[a-z0-9.]+$"
+
+    NewTrip:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+
     Trip:
+      allOf:
+        - $ref: "#/components/schemas/NewTrip"
       type: object
       required:
         - owner
-        - title
       properties:
         owner:
           $ref: "#/components/schemas/ObjectId"
-        title:
-          type: string
         start_date:
           type: string
+        end_date:
+          type: string
+          format: date-time
         spots:
           type: array
           items:
             $ref: "#/components/schemas/Spot"
-    Spot:
+
+    NewSpot:
       type: object
       required:
         - title
         - longitude
         - latitude
+        - date_from
         - images
       properties:
         title:
@@ -156,10 +184,22 @@ components:
           type: number
         latitude:
           type: number
+        date_from:
+          type: number
         images:
           type: array
           items:
             $ref: "#/components/schemas/Image"
+
+    Spot:
+      allOf:
+        - $ref: "#/components/schemas/NewSpot"
+      type: object
+      required:
+      properties:
+        date_to:
+          type: number
+
     Image:
       type: object
       required:
@@ -167,12 +207,15 @@ components:
       properties:
         source:
           type: string
-        description:
-          type: string
+        timestamp:
+          type: integer
+          format: int32
+
     ObjectId:
       description: A MongoDB ObjectId
       type: string
       pattern: "^[a-fA-F0-9]{24}$"
+
     Error:
       type: object
       required:
@@ -184,6 +227,7 @@ components:
           type: string
         code:
           $ref: "#/components/schemas/ErrorCode"
+
     ErrorCode:
       type: string
       enum:
@@ -191,6 +235,7 @@ components:
     Timestamp:
       type: string
       format: iso8601
+
   responses:
     ErrorResponse:
       description: Error Response
