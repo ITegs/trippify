@@ -17,10 +17,11 @@ type User struct {
 }
 
 type Trip struct {
-	Owner     primitive.ObjectID `json:"owner,omitempty" bson:"owner"`
-	Title     string             `json:"title,omitempty" bson:"title"`
-	StartDate string             `json:"start_date" bson:"start_date"`
-	EndDate   string             `json:"end_date" bson:"end_date"`
+	Owner     primitive.ObjectID   `json:"owner,omitempty" bson:"owner"`
+	Title     string               `json:"title,omitempty" bson:"title"`
+	StartDate string               `json:"start_date" bson:"start_date"`
+	EndDate   string               `json:"end_date" bson:"end_date"`
+	Spots     []primitive.ObjectID `json:"spots" bson:"spots"`
 }
 
 type image struct {
@@ -62,6 +63,7 @@ func init() {
 type db struct {
 	users *mongo.Collection
 	trips *mongo.Collection
+	spots *mongo.Collection
 }
 
 type DB interface {
@@ -69,13 +71,14 @@ type DB interface {
 	NewUser(user *User) error
 	GetTrip(tripId string) (*Trip, error)
 	NewTrip(trip *Trip) error
-	AddSpotToTrip(tripId string, spot Spot) error
+	AddSpot(spot Spot) error
 }
 
-func NewDB(users *mongo.Collection, trips *mongo.Collection) DB {
+func NewDB(users *mongo.Collection, trips *mongo.Collection, spots *mongo.Collection) DB {
 	db := &db{
 		users: users,
 		trips: trips,
+		spots: spots,
 	}
 
 	return db
@@ -116,6 +119,7 @@ func (db *db) GetUser(username string) (*User, error) {
 }
 
 func (db *db) NewUser(user *User) error {
+	user.Trips = []primitive.ObjectID{}
 	result, err := db.users.InsertOne(context.TODO(), user)
 	if err != nil {
 		return err
@@ -143,6 +147,7 @@ func (db *db) GetTrip(id string) (*Trip, error) {
 }
 
 func (db *db) NewTrip(trip *Trip) error {
+
 	tripResult, err := db.trips.InsertOne(context.TODO(), trip)
 	if err != nil {
 		return err
@@ -165,27 +170,25 @@ func (db *db) NewTrip(trip *Trip) error {
 	return nil
 }
 
-func (db *db) AddSpotToTrip(tripId string, spot Spot) error {
-	objectId, err := primitive.ObjectIDFromHex(tripId)
-	if err != nil {
-		return fmt.Errorf("invalid trip ID format: %v", err)
-	}
-
-	filter := bson.D{{Key: "_id", Value: objectId}}
-	update := bson.D{
-		{Key: "$push", Value: bson.D{
-			{Key: "spots", Value: spot},
-		}},
-	}
-
-	result, err := db.trips.UpdateOne(context.TODO(), filter, update)
+func (db *db) AddSpot(spot Spot) error {
+	spotResult, err := db.spots.InsertOne(context.TODO(), spot)
 	if err != nil {
 		return err
 	}
+	fmt.Println("Inserted a new spot: ", spotResult.InsertedID)
 
-	if result.ModifiedCount == 0 {
-		return fmt.Errorf("no document matching the filter found")
+	filter := bson.D{{Key: "_id", Value: spot.RoadtripId}}
+	update := bson.D{
+		{Key: "$push", Value: bson.D{
+			{Key: "spots", Value: spotResult.InsertedID},
+		}},
 	}
+
+	tripsResult, err := db.trips.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Added the spot to the trip: ", tripsResult.UpsertedID)
 
 	return nil
 }

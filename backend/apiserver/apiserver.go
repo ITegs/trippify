@@ -73,7 +73,7 @@ func (api *apiServer) buildApi() *httprouter.Router {
 		{
 			Method:  http.MethodPost,
 			Path:    "/trip/:tripId/spot/add",
-			Handler: http.HandlerFunc(api.AddSpotToTrip),
+			Handler: http.HandlerFunc(api.AddSpot),
 		},
 	}
 
@@ -168,6 +168,7 @@ func (api *apiServer) NewTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	trip.StartDate = time.Now().Format(time.RFC3339)
+	trip.Spots = []primitive.ObjectID{}
 
 	err = api.db.NewTrip(&trip)
 	if err != nil {
@@ -181,19 +182,29 @@ func (api *apiServer) NewTrip(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (api *apiServer) AddSpotToTrip(w http.ResponseWriter, r *http.Request) {
+func (api *apiServer) AddSpot(w http.ResponseWriter, r *http.Request) {
 	p := httprouter.ParamsFromContext(r.Context())
 	tripId := p.ByName("tripId")
 
 	var spot database.Spot
-	err := json.NewDecoder(r.Body).Decode(&spot)
+
+	tripObjectId, err := primitive.ObjectIDFromHex(tripId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(err)
+		return
+	}
+
+	spot.RoadtripId = tripObjectId
+
+	err = json.NewDecoder(r.Body).Decode(&spot)
 	if err != nil || spot.Title == "" || len(spot.Images) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println(err)
 		return
 	}
 
-	err = api.db.AddSpotToTrip(tripId, spot)
+	err = api.db.AddSpot(spot)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Println(err)

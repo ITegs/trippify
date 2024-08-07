@@ -27,8 +27,14 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	spots, err := database.CollectionFactory("trippify", "spots")
+	if err != nil {
+		fmt.Println("Couldn't get collection spots")
+		fmt.Println(err)
+		return
+	}
 
-	db := database.NewDB(users, trips)
+	db := database.NewDB(users, trips, spots)
 
 	api := apiserver.NewApiServer(db)
 

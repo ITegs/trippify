@@ -87,6 +87,12 @@ func initializeDB(db *mongo.Database) {
 			"end_date": bson.M{
 				"bsonType": "string",
 			},
+			"spots": bson.M{
+				"bsonType": "array",
+				"items": bson.M{
+					"bsonType": "objectId",
+				},
+			},
 		},
 	}
 
@@ -119,10 +125,10 @@ func initializeDB(db *mongo.Database) {
 				"bsonType": "string",
 			},
 			"longitude": bson.M{
-				"bsonType": "long",
+				"bsonType": "double",
 			},
 			"latitude": bson.M{
-				"bsonType": "long",
+				"bsonType": "double",
 			},
 			"date_from": bson.M{
 				"bsonType": "string",

@@ -145,8 +145,11 @@ components:
     NewTrip:
       type: object
       required:
+        - owner #TODO: Get the user from the auth
         - title
       properties:
+        owner:
+          $ref: "#/components/schemas/ObjectId"
         title:
           type: string
 
@@ -154,11 +157,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/NewTrip"
       type: object
-      required:
-        - owner
       properties:
-        owner:
-          $ref: "#/components/schemas/ObjectId"
         start_date:
           type: string
         end_date:
@@ -167,7 +166,7 @@ components:
         spots:
           type: array
           items:
-            $ref: "#/components/schemas/Spot"
+            $ref: "#/components/schemas/ObjectId"
 
     NewSpot:
       type: object
@@ -185,7 +184,10 @@ components:
         latitude:
           type: number
         date_from:
-          type: number
+          type: string
+          format: date-time
+        description:
+          type: string
         images:
           type: array
           items:
@@ -197,7 +199,8 @@ components:
       type: object
       properties:
         date_to:
-          type: number
+          type: string
+          format: date-time
 
     Image:
       type: object
