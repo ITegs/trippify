@@ -1,21 +1,21 @@
 <template>
   <div
-    id="modal"
-    :style="{ top: yPos + 'px' }"
-    :class="{
+      id="modal"
+      :style="{ top: yPos + 'px' }"
+      :class="{
       closed: modalState === ModalState.closed,
       half: modalState === ModalState.half,
       full: modalState === ModalState.full
     }"
   >
     <div
-      id="head"
-      v-drag="dragHandler"
-      :style="{
+        id="head"
+        v-drag="dragHandler"
+        :style="{
         boxShadow: modalState !== ModalState.closed ? '0 0 10px 0 rgba(0, 0, 0, 0.1)' : 'none'
       }"
     >
-      <span class="pull-line" />
+      <span class="pull-line"/>
 
       <div class="title">
         <p>{{ pretitle }}</p>
@@ -45,13 +45,13 @@
     </div>
 
     <div
-      class="content"
-      :style="{
+        class="content"
+        :style="{
         paddingTop: !modalState ? '10vh' : '0',
         opacity: modalState ? '1' : '0'
       }"
     >
-      <slot name="content" />
+      <slot name="content"/>
     </div>
   </div>
 </template>
@@ -64,17 +64,21 @@ const props = defineProps<{
   dateTo: Date | null
 }>()
 
-import { ref, type Ref } from 'vue'
-import WeatherChip from './WeatherChip.vue'
-import { useDrag } from '@vueuse/gesture'
+import {onUpdated, ref, type Ref} from 'vue'
+import {useDrag} from '@vueuse/gesture'
 
 const today = new Date()
-let duration = 0
-if (props.dateTo) {
-  duration = Math.floor((props.dateTo.getTime() - props.dateFrom.getTime()) / (1000 * 60 * 60 * 24))
-} else {
-  duration = Math.floor((today.getTime() - props.dateFrom.getTime()) / (1000 * 60 * 60 * 24))
-}
+const duration = ref(0)
+
+onUpdated(() => {
+      if (props.dateTo) {
+        duration.value = Math.floor((props.dateTo.getTime() - props.dateFrom.getTime()) / (1000 * 60 * 60 * 24))
+      } else {
+        duration.value = Math.floor((today.getTime() - props.dateFrom.getTime()) / (1000 * 60 * 60 * 24))
+      }
+    }
+)
+
 
 enum ModalState {
   'closed',
@@ -88,7 +92,7 @@ let lastY = yPos.value
 
 var modalState: Ref<ModalState> = ref(ModalState.closed)
 
-const dragHandler = ({ movement: [, y], dragging }: any) => {
+const dragHandler = ({movement: [, y], dragging}: any) => {
   if (dragging) {
     if (yPos.value + y > 40 && yPos.value + y < windowHeigth - 60) {
       yPos.value = y + lastY
@@ -189,6 +193,7 @@ useDrag(dragHandler, {
   #head {
     .title {
       grid-template-rows: 1fr !important;
+
       p {
         display: none;
       }

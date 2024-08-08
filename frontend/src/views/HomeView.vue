@@ -1,24 +1,40 @@
 <template>
-  <Map id="map" />
-  <Modal id="modal" :pretitle="pretitle" :title="title" :dateFrom="dateFrom" :dateTo="dateTo">
+  <Map id="map"/>
+  <Modal id="modal" :pretitle="`${spot.longitude}N ${spot.latitude}W`" :title="spot.title" :dateFrom="dateFrom" :dateTo="dateTo">
     <template #content>
-      <TripCarousel />
+      <TripCarousel/>
     </template>
   </Modal>
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
+import {onBeforeMount, ref, type Ref} from 'vue'
 
 import Map from '@/components/Map.vue'
 import Modal from '@/components/Modal.vue'
 import TripCarousel from '@/components/TripCarousel.vue'
+import {useTripStore} from '@/stores/trip'
+import type {Spot} from "trippify-client";
 
-const pretitle: Ref<String> = ref('55°29′N 8°27′E')
-const title: Ref<String> = ref('Malmö')
-const dateFrom: Ref<Date> = ref(new Date(Date.parse('2024-07-18')))
+
+const tripStore = useTripStore()
+
+const spot: Ref<Spot> = ref({} as Spot);
+const dateFrom: Ref<Date> = ref(new Date())
 const dateTo: Ref<Date | null> = ref(null)
-// const dateTo: Ref<Date | null> = ref(new Date(Date.parse('2024-07-24')))
+
+onBeforeMount(async () => {
+  await tripStore.setTrip('66b3df242162953c2a527d20');
+  const firstSpot = tripStore.trip.spots?.[0]
+  if (firstSpot) {
+    spot.value = await tripStore.getSpot(firstSpot)
+  }
+
+  dateFrom.value = new Date(spot.value.date_from);
+  if (spot.value.date_to){
+    dateTo.value = new Date(spot.value.date_to)
+  }
+});
 </script>
 
 <style scoped lang="scss">

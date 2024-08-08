@@ -21,6 +21,7 @@ const pathOptions: PolylineOptions = {
 }
 
 const markerOptions: CircleMarkerOptions = {
+  radius: 10,
   color: '#fb7646',
   weight: 5,
   fill: true,
