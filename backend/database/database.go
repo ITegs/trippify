@@ -72,6 +72,7 @@ type DB interface {
 	GetTrip(tripId string) (*Trip, error)
 	NewTrip(trip *Trip) error
 	AddSpot(spot Spot) error
+	GetSpot(spotId string) (*Spot, error)
 }
 
 func NewDB(users *mongo.Collection, trips *mongo.Collection, spots *mongo.Collection) DB {
@@ -128,8 +129,8 @@ func (db *db) NewUser(user *User) error {
 	return nil
 }
 
-func (db *db) GetTrip(id string) (*Trip, error) {
-	objectId, err := primitive.ObjectIDFromHex(id)
+func (db *db) GetTrip(tripId string) (*Trip, error) {
+	objectId, err := primitive.ObjectIDFromHex(tripId)
 	if err != nil {
 		return nil, err
 	}
@@ -191,4 +192,22 @@ func (db *db) AddSpot(spot Spot) error {
 	fmt.Println("Added the spot to the trip: ", tripsResult.UpsertedID)
 
 	return nil
+}
+
+func (db *db) GetSpot(spotId string) (*Spot, error) {
+	objectId, err := primitive.ObjectIDFromHex(spotId)
+	if err != nil {
+		return nil, err
+	}
+
+	result := db.spots.FindOne(context.TODO(), bson.D{{Key: "_id", Value: objectId}})
+
+	var spot Spot
+
+	err = result.Decode(&spot)
+	if err != nil {
+		return nil, err
+	}
+
+	return &spot, nil
 }

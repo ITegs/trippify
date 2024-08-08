@@ -111,6 +111,27 @@ paths:
               schema:
                 $ref: "#/components/schemas/Spot"
 
+  /api/spot/{spotId}:
+    get:
+      operationId: spot.get
+      summary: Get the spot with the given id
+      parameters:
+        - name: spotId
+          in: path
+          required: true
+          description: The id of the spot
+          schema:
+            $ref: "#/components/schemas/ObjectId"
+      responses:
+        200:
+          description: The requested spot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Spot"
+        404:
+          $ref: "#/components/responses/ErrorResponse"
+
 components:
   schemas:
     NewUser:
@@ -198,6 +219,8 @@ components:
         - $ref: "#/components/schemas/NewSpot"
       type: object
       properties:
+        _id:
+          $ref: "#/components/schemas/ObjectId"
         date_to:
           type: string
           format: date-time

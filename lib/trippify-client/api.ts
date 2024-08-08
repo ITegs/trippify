@@ -50,10 +50,10 @@ export interface Image {
     'source': string;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof Image
      */
-    'description'?: string;
+    'timestamp'?: number;
 }
 /**
  * 
@@ -79,9 +79,102 @@ export interface ModelError {
 /**
  * 
  * @export
+ * @interface NewSpot
+ */
+export interface NewSpot {
+    /**
+     * 
+     * @type {string}
+     * @memberof NewSpot
+     */
+    'title': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof NewSpot
+     */
+    'longitude': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof NewSpot
+     */
+    'latitude': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof NewSpot
+     */
+    'date_from': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NewSpot
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {Array<Image>}
+     * @memberof NewSpot
+     */
+    'images': Array<Image>;
+}
+/**
+ * 
+ * @export
+ * @interface NewTrip
+ */
+export interface NewTrip {
+    /**
+     * A MongoDB ObjectId
+     * @type {string}
+     * @memberof NewTrip
+     */
+    'owner': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NewTrip
+     */
+    'title': string;
+}
+/**
+ * 
+ * @export
+ * @interface NewUser
+ */
+export interface NewUser {
+    /**
+     * 
+     * @type {string}
+     * @memberof NewUser
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NewUser
+     */
+    'name': string;
+}
+/**
+ * 
+ * @export
  * @interface Spot
  */
 export interface Spot {
+    /**
+     * A MongoDB ObjectId
+     * @type {string}
+     * @memberof Spot
+     */
+    '_id'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Spot
+     */
+    'date_to'?: string;
     /**
      * 
      * @type {string}
@@ -102,6 +195,18 @@ export interface Spot {
     'latitude': number;
     /**
      * 
+     * @type {string}
+     * @memberof Spot
+     */
+    'date_from': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Spot
+     */
+    'description'?: string;
+    /**
+     * 
      * @type {Array<Image>}
      * @memberof Spot
      */
@@ -114,6 +219,24 @@ export interface Spot {
  */
 export interface Trip {
     /**
+     * 
+     * @type {string}
+     * @memberof Trip
+     */
+    'start_date'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Trip
+     */
+    'end_date'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof Trip
+     */
+    'spots'?: Array<string>;
+    /**
      * A MongoDB ObjectId
      * @type {string}
      * @memberof Trip
@@ -125,18 +248,6 @@ export interface Trip {
      * @memberof Trip
      */
     'title': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Trip
-     */
-    'start_date'?: string;
-    /**
-     * 
-     * @type {Array<Spot>}
-     * @memberof Trip
-     */
-    'spots'?: Array<Spot>;
 }
 /**
  * 
@@ -144,6 +255,18 @@ export interface Trip {
  * @interface User
  */
 export interface User {
+    /**
+     * A MongoDB ObjectId
+     * @type {string}
+     * @memberof User
+     */
+    '_id': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof User
+     */
+    'trips'?: Array<string>;
     /**
      * 
      * @type {string}
@@ -156,12 +279,6 @@ export interface User {
      * @memberof User
      */
     'name': string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof User
-     */
-    'trips'?: Array<string>;
 }
 
 /**
@@ -174,15 +291,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * 
          * @summary Add a spot to a given trip
          * @param {string} tripId The id of the trip
-         * @param {Spot} spot 
+         * @param {NewSpot} newSpot 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addSpotToTripPost: async (tripId: string, spot: Spot, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        addSpotToTripPost: async (tripId: string, newSpot: NewSpot, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'tripId' is not null or undefined
             assertParamExists('addSpotToTripPost', 'tripId', tripId)
-            // verify required parameter 'spot' is not null or undefined
-            assertParamExists('addSpotToTripPost', 'spot', spot)
+            // verify required parameter 'newSpot' is not null or undefined
+            assertParamExists('addSpotToTripPost', 'newSpot', newSpot)
             const localVarPath = `/api/trip/{tripId}/spot/add`
                 .replace(`{${"tripId"}}`, encodeURIComponent(String(tripId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -203,7 +320,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(spot, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(newSpot, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -213,13 +330,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Create a new trip
-         * @param {Trip} trip 
+         * @param {NewTrip} newTrip 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        newTripPost: async (trip: Trip, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'trip' is not null or undefined
-            assertParamExists('newTripPost', 'trip', trip)
+        newTripPost: async (newTrip: NewTrip, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'newTrip' is not null or undefined
+            assertParamExists('newTripPost', 'newTrip', newTrip)
             const localVarPath = `/api/newTrip`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -239,7 +356,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(trip, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(newTrip, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -249,13 +366,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Create a new user
-         * @param {User} user 
+         * @param {NewUser} newUser 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        newUserPost: async (user: User, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'user' is not null or undefined
-            assertParamExists('newUserPost', 'user', user)
+        newUserPost: async (newUser: NewUser, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'newUser' is not null or undefined
+            assertParamExists('newUserPost', 'newUser', newUser)
             const localVarPath = `/api/newUser`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -275,7 +392,41 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(user, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(newUser, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get the spot with the given id
+         * @param {string} spotId The id of the spot
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        spotGet: async (spotId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'spotId' is not null or undefined
+            assertParamExists('spotGet', 'spotId', spotId)
+            const localVarPath = `/api/spot/{spotId}`
+                .replace(`{${"spotId"}}`, encodeURIComponent(String(spotId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -301,7 +452,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -364,12 +515,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * 
          * @summary Add a spot to a given trip
          * @param {string} tripId The id of the trip
-         * @param {Spot} spot 
+         * @param {NewSpot} newSpot 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async addSpotToTripPost(tripId: string, spot: Spot, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Trip>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.addSpotToTripPost(tripId, spot, options);
+        async addSpotToTripPost(tripId: string, newSpot: NewSpot, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Spot>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.addSpotToTripPost(tripId, newSpot, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.addSpotToTripPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -377,12 +528,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Create a new trip
-         * @param {Trip} trip 
+         * @param {NewTrip} newTrip 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async newTripPost(trip: Trip, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Trip>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.newTripPost(trip, options);
+        async newTripPost(newTrip: NewTrip, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Trip>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.newTripPost(newTrip, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.newTripPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -390,14 +541,27 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Create a new user
-         * @param {User} user 
+         * @param {NewUser} newUser 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async newUserPost(user: User, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.newUserPost(user, options);
+        async newUserPost(newUser: NewUser, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.newUserPost(newUser, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.newUserPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get the spot with the given id
+         * @param {string} spotId The id of the spot
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async spotGet(spotId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Spot>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.spotGet(spotId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.spotGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -440,32 +604,42 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * 
          * @summary Add a spot to a given trip
          * @param {string} tripId The id of the trip
-         * @param {Spot} spot 
+         * @param {NewSpot} newSpot 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addSpotToTripPost(tripId: string, spot: Spot, options?: any): AxiosPromise<Trip> {
-            return localVarFp.addSpotToTripPost(tripId, spot, options).then((request) => request(axios, basePath));
+        addSpotToTripPost(tripId: string, newSpot: NewSpot, options?: any): AxiosPromise<Spot> {
+            return localVarFp.addSpotToTripPost(tripId, newSpot, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Create a new trip
-         * @param {Trip} trip 
+         * @param {NewTrip} newTrip 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        newTripPost(trip: Trip, options?: any): AxiosPromise<Trip> {
-            return localVarFp.newTripPost(trip, options).then((request) => request(axios, basePath));
+        newTripPost(newTrip: NewTrip, options?: any): AxiosPromise<Trip> {
+            return localVarFp.newTripPost(newTrip, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Create a new user
-         * @param {User} user 
+         * @param {NewUser} newUser 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        newUserPost(user: User, options?: any): AxiosPromise<User> {
-            return localVarFp.newUserPost(user, options).then((request) => request(axios, basePath));
+        newUserPost(newUser: NewUser, options?: any): AxiosPromise<User> {
+            return localVarFp.newUserPost(newUser, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get the spot with the given id
+         * @param {string} spotId The id of the spot
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        spotGet(spotId: string, options?: any): AxiosPromise<Spot> {
+            return localVarFp.spotGet(spotId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -501,37 +675,49 @@ export class DefaultApi extends BaseAPI {
      * 
      * @summary Add a spot to a given trip
      * @param {string} tripId The id of the trip
-     * @param {Spot} spot 
+     * @param {NewSpot} newSpot 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public addSpotToTripPost(tripId: string, spot: Spot, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).addSpotToTripPost(tripId, spot, options).then((request) => request(this.axios, this.basePath));
+    public addSpotToTripPost(tripId: string, newSpot: NewSpot, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).addSpotToTripPost(tripId, newSpot, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Create a new trip
-     * @param {Trip} trip 
+     * @param {NewTrip} newTrip 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public newTripPost(trip: Trip, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).newTripPost(trip, options).then((request) => request(this.axios, this.basePath));
+    public newTripPost(newTrip: NewTrip, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).newTripPost(newTrip, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Create a new user
-     * @param {User} user 
+     * @param {NewUser} newUser 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public newUserPost(user: User, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).newUserPost(user, options).then((request) => request(this.axios, this.basePath));
+    public newUserPost(newUser: NewUser, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).newUserPost(newUser, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get the spot with the given id
+     * @param {string} spotId The id of the spot
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public spotGet(spotId: string, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).spotGet(spotId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -75,6 +75,11 @@ func (api *apiServer) buildApi() *httprouter.Router {
 			Path:    "/trip/:tripId/spot/add",
 			Handler: http.HandlerFunc(api.AddSpot),
 		},
+		{
+			Method:  http.MethodGet,
+			Path:    "/spot/:spotId",
+			Handler: http.HandlerFunc(api.GetSpot),
+		},
 	}
 
 	for i := 0; i < len(routes); i++ {
@@ -212,5 +217,31 @@ func (api *apiServer) AddSpot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	return
+}
+
+func (api *apiServer) GetSpot(w http.ResponseWriter, r *http.Request) {
+	p := httprouter.ParamsFromContext(r.Context())
+	spotId := p.ByName("spotId")
+
+	spot, err := api.db.GetSpot(spotId)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.Header().Add("Access-Control-Allow-Origin", "*") // TODO: Remove
+	w.WriteHeader(http.StatusOK)
+	encoder := json.NewEncoder(w)
+	encoder.SetEscapeHTML(false)
+
+	err = encoder.Encode(spot)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	return
 }
