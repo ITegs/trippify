@@ -2,6 +2,21 @@ version: "3"
 name: trippify
 
 services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/certs:/etc/letsencrypt
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/log/letsencrypt:/var/log/letsencrypt
+
   mongodb:
     image: mongo:latest
     command: --quiet --logpath /dev/null
@@ -10,17 +25,25 @@ services:
     volumes:
       - mongodb-data:/data/db:rw
 
-  main:
+  backend:
     build:
       context: ./backend
       target: hot-reload
-    command: '-build="sleep 3 && go build -o /build main.go" -command="/build/main" -log-prefix=false'
+    command: -build="sleep 3 && go build -o /build main.go" -command="/build/main" -log-prefix=false
     volumes:
       - ./backend:/app:ro
     depends_on:
+      - nginx
       - mongodb
-    ports:
-      - "80:80"
+
+  frontend:
+    build:
+      context: ./frontend
+    command: dev:network
+    depends_on:
+      - nginx
+      - backend
 
 volumes:
   mongodb-data:
+

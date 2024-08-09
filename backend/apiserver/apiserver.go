@@ -32,7 +32,7 @@ func (api *apiServer) Main() {
 	apiHandler := api.buildApi()
 
 	server := http.Server{
-		Addr:    ":80",
+		Addr:    ":3000",
 		Handler: apiHandler,
 	}
 
@@ -173,7 +173,7 @@ func (api *apiServer) NewTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	trip.StartDate = time.Now().Format(time.RFC3339)
-	trip.Spots = []primitive.ObjectID{}
+	trip.Spots = []database.TripSpot{}
 
 	err = api.db.NewTrip(&trip)
 	if err != nil {
