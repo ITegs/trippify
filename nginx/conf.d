@@ -27,8 +27,8 @@ http {
         listen 443 ssl;
         server_name go.jo-dev.de www.go.jo-dev.de;
 
-        ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
-        ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+        ssl_certificate /etc/letsencrypt/live/go.jo-dev.de/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/go.jo-dev.de/privkey.pem;
         include /etc/letsencrypt/options-ssl-nginx.conf;
         ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
