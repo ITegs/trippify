@@ -17,27 +17,33 @@ type User struct {
 }
 
 type Trip struct {
-	Owner     primitive.ObjectID   `json:"owner,omitempty" bson:"owner"`
-	Title     string               `json:"title,omitempty" bson:"title"`
-	StartDate string               `json:"start_date" bson:"start_date"`
-	EndDate   string               `json:"end_date" bson:"end_date"`
-	Spots     []primitive.ObjectID `json:"spots" bson:"spots"`
+	Owner     primitive.ObjectID `json:"owner,omitempty" bson:"owner"`
+	Title     string             `json:"title,omitempty" bson:"title"`
+	StartDate string             `json:"start_date" bson:"start_date"`
+	EndDate   string             `json:"end_date" bson:"end_date"`
+	Spots     []TripSpot         `json:"spots" bson:"spots"`
 }
 
-type image struct {
-	Source    string `json:"source,omitempty" bson:"source"`
-	Timestamp int32  `json:"timestamp" bson:"timestamp"`
+type TripSpot struct {
+	SpotId    primitive.ObjectID `json:"spotId,omitempty" bson:"spotId"`
+	Latitude  float64            `json:"latitude,omitempty" bson:"latitude"`
+	Longitude float64            `json:"longitude,omitempty" bson:"longitude"`
 }
 
 type Spot struct {
 	RoadtripId  primitive.ObjectID `json:"roadtripId,omitempty" bson:"roadtripId"`
 	Title       string             `json:"title,omitempty" bson:"title"`
-	Longitude   float64            `json:"longitude,omitempty" bson:"longitude"`
 	Latitude    float64            `json:"latitude,omitempty" bson:"latitude"`
+	Longitude   float64            `json:"longitude,omitempty" bson:"longitude"`
 	Images      []image            `json:"images,omitempty" bson:"images"`
 	Description string             `json:"description" bson:"description"`
 	DateFrom    string             `json:"date_from" bson:"date_from"`
 	DateTo      string             `json:"date_to" bson:"date_to"`
+}
+
+type image struct {
+	Source    string `json:"source,omitempty" bson:"source"`
+	Timestamp int32  `json:"timestamp" bson:"timestamp"`
 }
 
 var mCl *mongo.Client
@@ -178,10 +184,16 @@ func (db *db) AddSpot(spot Spot) error {
 	}
 	fmt.Println("Inserted a new spot: ", spotResult.InsertedID)
 
+	tripSpot := TripSpot{
+		SpotId:    spotResult.InsertedID.(primitive.ObjectID),
+		Longitude: spot.Longitude,
+		Latitude:  spot.Latitude,
+	}
+
 	filter := bson.D{{Key: "_id", Value: spot.RoadtripId}}
 	update := bson.D{
 		{Key: "$push", Value: bson.D{
-			{Key: "spots", Value: spotResult.InsertedID},
+			{Key: "spots", Value: tripSpot},
 		}},
 	}
 

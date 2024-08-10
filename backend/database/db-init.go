@@ -90,7 +90,18 @@ func initializeDB(db *mongo.Database) {
 			"spots": bson.M{
 				"bsonType": "array",
 				"items": bson.M{
-					"bsonType": "objectId",
+					"bsonType": "object",
+					"properties": bson.M{
+						"spotId": bson.M{
+							"bsonType": "objectId",
+						},
+						"latitude": bson.M{
+							"bsonType": "double",
+						},
+						"longitude": bson.M{
+							"bsonType": "double",
+						},
+					},
 				},
 			},
 		},
