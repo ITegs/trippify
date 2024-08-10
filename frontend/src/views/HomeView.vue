@@ -1,6 +1,7 @@
 <template>
-  <Map id="map"/>
-  <Modal id="modal" :pretitle="`${spot.longitude}N ${spot.latitude}W`" :title="spot.title" :dateFrom="dateFrom" :dateTo="dateTo">
+  <Map id="map" :marker="marker"/>
+  <Modal id="modal" :pretitle="`${spot.latitude} // ${spot.longitude}`" :title="spot.title" :dateFrom="dateFrom"
+         :dateTo="dateTo">
     <template #content>
       <TripCarousel/>
     </template>
@@ -15,6 +16,7 @@ import Modal from '@/components/Modal.vue'
 import TripCarousel from '@/components/TripCarousel.vue'
 import {useTripStore} from '@/stores/trip'
 import type {Spot} from "trippify-client";
+import L from "leaflet";
 
 
 const tripStore = useTripStore()
@@ -23,17 +25,21 @@ const spot: Ref<Spot> = ref({} as Spot);
 const dateFrom: Ref<Date> = ref(new Date())
 const dateTo: Ref<Date | null> = ref(null)
 
+const marker: Ref<L.LatLngTuple[]> = ref([] as L.LatLngTuple[])
+
 onBeforeMount(async () => {
   await tripStore.setTrip('66b3df242162953c2a527d20');
   const firstSpot = tripStore.trip.spots?.[0]
   if (firstSpot) {
-    spot.value = await tripStore.getSpot(firstSpot)
+    spot.value = await tripStore.getSpot(firstSpot.spotId)
   }
 
   dateFrom.value = new Date(spot.value.date_from);
-  if (spot.value.date_to){
+  if (spot.value.date_to) {
     dateTo.value = new Date(spot.value.date_to)
   }
+
+  marker.value = tripStore.trip.spots?.map(spot => [spot.latitude, spot.longitude]) ?? [];
 });
 </script>
 

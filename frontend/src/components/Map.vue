@@ -1,36 +1,21 @@
 <template>
-  <div id="map" />
+  <div id="map"/>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import L, { type CircleMarkerOptions, type LatLngExpression, type PolylineOptions } from 'leaflet'
+import {onMounted, watch} from 'vue'
+import L from 'leaflet'
 
-const marker: LatLngExpression[] = [
-  [48.13807, 11.57523],
-  [48.2, 11.6],
-  [48.1, 11.7],
-  [48.3, 11.8],
-  [48.4, 11.9]
-]
+const props = defineProps<{
+  marker: L.LatLngTuple[]
+}>()
 
-const pathOptions: PolylineOptions = {
-  color: '#fb7646',
-  weight: 5,
-  dashArray: '10, 10'
-}
+let map: L.Map
 
-const markerOptions: CircleMarkerOptions = {
-  radius: 10,
-  color: '#fb7646',
-  weight: 5,
-  fill: true,
-  fillOpacity: 1
-}
 
 onMounted(() => {
   const initialView: L.LatLngExpression = [48.13807, 11.57523]
-  const map = L.map('map').setView(initialView, 13)
+  map = L.map('map').setView(initialView, 13)
   L.tileLayer(import.meta.env.VITE_TILE_URL + import.meta.env.VITE_TILE_KEY, {
     maxZoom: 19,
     attribution: import.meta.env.VITE_MAP_ATTRIBUTION
@@ -38,13 +23,51 @@ onMounted(() => {
 
   map.zoomControl.remove()
   map.attributionControl.setPosition('topleft')
+})
+
+watch(() => props.marker, (newMarkers) => {
+  console.log(newMarkers)
+
+  drawMarker(props.marker, map)
+  drawPath(props.marker, map)
+  setViewToCenter(props.marker, map)
+})
+
+
+function drawMarker(marker: L.LatLngTuple[], map: L.Map) {
+  const markerOptions: L.CircleMarkerOptions = {
+    radius: 8,
+    color: '#fb7646',
+    weight: 5,
+    fill: true,
+    fillOpacity: 1
+  }
 
   marker.forEach((m) => {
     L.circleMarker(m, markerOptions).addTo(map)
   })
+}
 
-  const path = L.polyline(marker, pathOptions).addTo(map)
-})
+
+function drawPath(marker: L.LatLngTuple[], map: L.Map) {
+  const pathOptions: L.PolylineOptions = {
+    color: '#fb7646',
+    weight: 3,
+    dashArray: '10, 10'
+  }
+
+  L.polyline(marker, pathOptions).addTo(map)
+}
+
+
+function setViewToCenter(marker: L.LatLngTuple[], map: L.Map) {
+  const fitBoundsOptions: L.FitBoundsOptions = {
+    padding: [70, 0],
+  }
+
+  const bounds = L.latLngBounds(marker);
+  map.fitBounds(bounds, fitBoundsOptions);
+}
 </script>
 
 <style scoped lang="scss">
