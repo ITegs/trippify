@@ -1,4 +1,5 @@
 <template>
+  <Header :trip="tripStore.trip as Trip" :traveler="traveler as User"/>
   <Map id="map" :marker="marker"/>
   <Modal id="modal" :pretitle="`${spot.latitude} // ${spot.longitude}`" :title="spot.title" :dateFrom="dateFrom"
          :dateTo="dateTo">
@@ -11,21 +12,26 @@
 <script setup lang="ts">
 import {onBeforeMount, ref, type Ref} from 'vue'
 
+import Header from "@/components/Header.vue";
 import Map from '@/components/Map.vue'
 import Modal from '@/components/Modal.vue'
 import TripCarousel from '@/components/TripCarousel.vue'
 import {useTripStore} from '@/stores/trip'
-import type {Spot} from "trippify-client";
+import type {Spot, Trip, User} from "trippify-client";
 import L from "leaflet";
+import {useUserStore} from "@/stores/user";
 
 
 const tripStore = useTripStore()
+const userStore = useUserStore()
 
 const spot: Ref<Spot> = ref({} as Spot);
 const dateFrom: Ref<Date> = ref(new Date())
 const dateTo: Ref<Date | null> = ref(null)
 
 const marker: Ref<L.LatLngTuple[]> = ref([] as L.LatLngTuple[])
+
+const traveler: Ref<User> = ref({} as User)
 
 onBeforeMount(async () => {
   await tripStore.setTrip('66b3df242162953c2a527d20');
@@ -40,6 +46,8 @@ onBeforeMount(async () => {
   }
 
   marker.value = tripStore.trip.spots?.map(spot => [spot.latitude, spot.longitude]) ?? [];
+
+  traveler.value = await userStore.getUser(tripStore.trip.owner);
 });
 </script>
 

@@ -26,8 +26,6 @@ onMounted(() => {
 })
 
 watch(() => props.marker, (newMarkers) => {
-  console.log(newMarkers)
-
   drawMarker(props.marker, map)
   drawPath(props.marker, map)
   setViewToCenter(props.marker, map)
