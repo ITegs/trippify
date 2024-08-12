@@ -29,6 +29,9 @@ func initializeDB(db *mongo.Database) {
 			"name": bson.M{
 				"bsonType": "string",
 			},
+			"profile_pic": bson.M{
+				"bsonType": "string",
+			},
 			"trips": bson.M{
 				"bsonType": "array",
 				"items": bson.M{
@@ -76,7 +79,8 @@ func initializeDB(db *mongo.Database) {
 				"bsonType": "objectId",
 			},
 			"owner": bson.M{
-				"bsonType": "objectId",
+				"bsonType": "string",
+				"pattern":  "^[a-z0-9.]+$",
 			},
 			"title": bson.M{
 				"bsonType": "string",

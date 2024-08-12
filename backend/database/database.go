@@ -11,17 +11,18 @@ import (
 )
 
 type User struct {
-	Username string               `json:"username,omitempty" bson:"username"`
-	Name     string               `json:"name,omitempty" bson:"name"`
-	Trips    []primitive.ObjectID `json:"trips" bson:"trips"`
+	Username   string               `json:"username,omitempty" bson:"username"`
+	Name       string               `json:"name,omitempty" bson:"name"`
+	ProfilePic string               `json:"profile_pic" bson:"profile_pic"`
+	Trips      []primitive.ObjectID `json:"trips" bson:"trips"`
 }
 
 type Trip struct {
-	Owner     primitive.ObjectID `json:"owner,omitempty" bson:"owner"`
-	Title     string             `json:"title,omitempty" bson:"title"`
-	StartDate string             `json:"start_date" bson:"start_date"`
-	EndDate   string             `json:"end_date" bson:"end_date"`
-	Spots     []TripSpot         `json:"spots" bson:"spots"`
+	Owner     string     `json:"owner,omitempty" bson:"owner"`
+	Title     string     `json:"title,omitempty" bson:"title"`
+	StartDate string     `json:"start_date" bson:"start_date"`
+	EndDate   string     `json:"end_date" bson:"end_date"`
+	Spots     []TripSpot `json:"spots" bson:"spots"`
 }
 
 type TripSpot struct {
