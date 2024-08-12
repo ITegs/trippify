@@ -93,13 +93,13 @@ export interface NewSpot {
      * @type {number}
      * @memberof NewSpot
      */
-    'longitude': number;
+    'latitude': number;
     /**
      * 
      * @type {number}
      * @memberof NewSpot
      */
-    'latitude': number;
+    'longitude': number;
     /**
      * 
      * @type {string}
@@ -186,13 +186,13 @@ export interface Spot {
      * @type {number}
      * @memberof Spot
      */
-    'longitude': number;
+    'latitude': number;
     /**
      * 
      * @type {number}
      * @memberof Spot
      */
-    'latitude': number;
+    'longitude': number;
     /**
      * 
      * @type {string}
@@ -232,10 +232,10 @@ export interface Trip {
     'end_date'?: string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<TripSpot>}
      * @memberof Trip
      */
-    'spots'?: Array<string>;
+    'spots'?: Array<TripSpot>;
     /**
      * A MongoDB ObjectId
      * @type {string}
@@ -248,6 +248,31 @@ export interface Trip {
      * @memberof Trip
      */
     'title': string;
+}
+/**
+ * 
+ * @export
+ * @interface TripSpot
+ */
+export interface TripSpot {
+    /**
+     * A MongoDB ObjectId
+     * @type {string}
+     * @memberof TripSpot
+     */
+    'spotId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof TripSpot
+     */
+    'latitude': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof TripSpot
+     */
+    'longitude': number;
 }
 /**
  * 

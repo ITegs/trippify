@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci && npm cache clean --force
 
-COPY ./src ./src
+COPY . .
 
 EXPOSE 5173
 

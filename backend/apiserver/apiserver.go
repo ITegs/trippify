@@ -51,6 +51,14 @@ func (api *apiServer) buildApi() *httprouter.Router {
 
 	var routes = []*Route{
 		{
+			Method: http.MethodGet,
+			Path:   "/",
+			Handler: http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+				writer.Write([]byte("API is up and running!"))
+				writer.WriteHeader(http.StatusOK)
+			}),
+		},
+		{
 			Method:  http.MethodGet,
 			Path:    "/user/:username",
 			Handler: http.HandlerFunc(api.GetUser),
@@ -173,7 +181,7 @@ func (api *apiServer) NewTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	trip.StartDate = time.Now().Format(time.RFC3339)
-	trip.Spots = []database.TripSpot{}
+	//trip.Spots = []database.Trip{}
 
 	err = api.db.NewTrip(&trip)
 	if err != nil {
