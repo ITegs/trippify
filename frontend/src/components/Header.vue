@@ -9,9 +9,9 @@
       <img :src="traveler.profile_pic" alt="Profile picture"/>
     </div>
   </div>
-  <div v-if="userStore.user.username === trip.owner" class="addSpot" @click="addSpot">
+  <a v-if="userStore.user.username === trip.owner" class="addSpot" href="/addSpot">
     <img src="../assets/icons/plus-solid.svg" alt="plus-solid"/>
-  </div>
+  </a>
 </template>
 
 <script setup lang="ts">
@@ -31,6 +31,7 @@ userStore.setUser("joe", "")
 
 const addSpot = () => {
 //   TODO: go to the add spot view
+
 }
 </script>
 
