@@ -110,6 +110,7 @@ func (api *apiServer) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Add("Content-Type", "application/json")
+	w.Header().Add("Access-Control-Allow-Origin", "*") // TODO: Remove
 	w.WriteHeader(http.StatusOK)
 	encoder := json.NewEncoder(w)
 	encoder.SetEscapeHTML(false)
@@ -174,14 +175,15 @@ func (api *apiServer) GetTrip(w http.ResponseWriter, r *http.Request) {
 func (api *apiServer) NewTrip(w http.ResponseWriter, r *http.Request) {
 	var trip database.Trip
 	err := json.NewDecoder(r.Body).Decode(&trip)
-	if err != nil || trip.Title == "" || trip.Owner == primitive.NilObjectID {
+	if err != nil || trip.Title == "" || trip.Owner == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println(err)
 		return
 	}
 
 	trip.StartDate = time.Now().Format(time.RFC3339)
-	//trip.Spots = []database.Trip{}
+
+	trip.Spots = []database.TripSpot{}
 
 	err = api.db.NewTrip(&trip)
 	if err != nil {

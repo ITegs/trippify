@@ -144,6 +144,8 @@ components:
           $ref: "#/components/schemas/Username"
         name:
           type: string
+        profile_pic:
+          type: string
 
     User:
       allOf:
@@ -170,7 +172,7 @@ components:
         - title
       properties:
         owner:
-          $ref: "#/components/schemas/ObjectId"
+          $ref: "#/components/schemas/Username"
         title:
           type: string
 

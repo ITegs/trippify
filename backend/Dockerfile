@@ -34,7 +34,7 @@
     COPY . .
     RUN go build -o /build main.go
     RUN go build -o /build/apiserver apiserver/apiserver.go
-    RUN go build -o /build/database database/database.go
+    RUN go build -o /build/database database/*.go
 
     # +-----------------------------------------------------------------------------
     # | Assemble the final image, which doesn't need the source code or golang

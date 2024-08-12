@@ -57,15 +57,15 @@
 </template>
 
 <script setup lang="ts">
+import {onUpdated, ref, type Ref} from 'vue'
+import {useDrag} from '@vueuse/gesture'
+
 const props = defineProps<{
   pretitle: String
   title: String
   dateFrom: Date
   dateTo: Date | null
 }>()
-
-import {onUpdated, ref, type Ref} from 'vue'
-import {useDrag} from '@vueuse/gesture'
 
 const today = new Date()
 const duration = ref(0)
@@ -78,7 +78,6 @@ onUpdated(() => {
       }
     }
 )
-
 
 enum ModalState {
   'closed',
