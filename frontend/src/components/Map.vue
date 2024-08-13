@@ -4,10 +4,19 @@
 
 <script setup lang="ts">
 import {onMounted, watch} from 'vue'
-import L from 'leaflet'
+import L, {type LatLngTuple} from 'leaflet'
+
+type Marker = {
+  spotId: string,
+  latLng: LatLngTuple
+}
 
 const props = defineProps<{
-  marker: L.LatLngTuple[]
+  marker: Marker[]
+}>()
+
+const emit = defineEmits<{
+  changedSpot: [string]
 }>()
 
 let map: L.Map
@@ -32,7 +41,7 @@ watch(() => props.marker, (newMarkers) => {
 })
 
 
-function drawMarker(marker: L.LatLngTuple[], map: L.Map) {
+function drawMarker(marker: Marker[], map: L.Map) {
   const markerOptions: L.CircleMarkerOptions = {
     radius: 8,
     color: '#fb7646',
@@ -42,29 +51,42 @@ function drawMarker(marker: L.LatLngTuple[], map: L.Map) {
   }
 
   marker.forEach((m) => {
-    L.circleMarker(m, markerOptions).addTo(map)
+    const marker = L.circleMarker(m.latLng, markerOptions).addTo(map)
+    marker.on("click", () => handleMarkerClick(m.spotId))
   })
 }
 
 
-function drawPath(marker: L.LatLngTuple[], map: L.Map) {
+function drawPath(marker: Marker[], map: L.Map) {
   const pathOptions: L.PolylineOptions = {
     color: '#fb7646',
     weight: 3,
     dashArray: '10, 10'
   }
 
-  L.polyline(marker, pathOptions).addTo(map)
+  const latLngs: LatLngTuple[] = marker.map((m) => {
+    return m.latLng
+  })
+
+  L.polyline(latLngs, pathOptions).addTo(map)
 }
 
 
-function setViewToCenter(marker: L.LatLngTuple[], map: L.Map) {
+function setViewToCenter(marker: Marker[], map: L.Map) {
   const fitBoundsOptions: L.FitBoundsOptions = {
     padding: [70, 0],
   }
 
-  const bounds = L.latLngBounds(marker);
+  const latLngs: LatLngTuple[] = marker.map((m) => {
+    return m.latLng
+  })
+
+  const bounds = L.latLngBounds(latLngs);
   map.fitBounds(bounds, fitBoundsOptions);
+}
+
+function handleMarkerClick(spotId: string) {
+  emit('changedSpot', spotId)
 }
 </script>
 
