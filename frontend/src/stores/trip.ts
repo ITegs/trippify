@@ -1,5 +1,6 @@
 import {defineStore} from 'pinia'
 import {DefaultApi, type Spot, type Trip} from 'trippify-client/api'
+import type {NewSpot} from "trippify-client";
 
 export const useTripStore = defineStore('trip', {
   state: () => ({
@@ -7,7 +8,11 @@ export const useTripStore = defineStore('trip', {
     spots: [] as Spot[],
   }),
 
-  getters: {},
+  getters: {
+    // getSpot: (state) => (id: string) => {
+    //   return state.spots.find((a) => a._id === id)
+    // },
+  },
 
   actions: {
     async setTrip(tripId: string) {
@@ -16,7 +21,7 @@ export const useTripStore = defineStore('trip', {
       this.$patch({trip})
     },
 
-    async addSpotToTrip(tripId: string, spot: Spot) {
+    async addSpotToTrip(tripId: string, spot: NewSpot) {
       const api = new DefaultApi()
 
       try {

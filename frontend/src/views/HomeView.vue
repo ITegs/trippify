@@ -1,12 +1,15 @@
 <template>
-  <Header :trip="tripStore.trip as Trip" :traveler="traveler as User"/>
-  <Map id="map" :marker="marker"/>
-  <Modal id="modal" :pretitle="`${spot.latitude} // ${spot.longitude}`" :title="spot.title" :dateFrom="dateFrom"
-         :dateTo="dateTo">
-    <template #content>
-      <TripCarousel/>
-    </template>
-  </Modal>
+  <div class="noscroll">
+    <Header :trip="tripStore.trip as Trip" :traveler="traveler as User"/>
+    <Map id="map" :marker="marker"/>
+    <Modal id="modal" :pretitle="`${spot.latitude} // ${spot.longitude}`" :title="spot.title" :dateFrom="dateFrom"
+           :dateTo="dateTo">
+      <template #content>
+        <TripCarousel :spot="spot"/>
+        <p>{{ spot.description }}</p>
+      </template>
+    </Modal>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -35,7 +38,7 @@ const traveler: Ref<User> = ref({} as User)
 
 onBeforeMount(async () => {
   await tripStore.setTrip('66b3df242162953c2a527d20');
-  const firstSpot = tripStore.trip.spots?.[0]
+  const firstSpot = tripStore.trip.spots?.[tripStore.trip.spots.length - 1]
   if (firstSpot) {
     spot.value = await tripStore.getSpot(firstSpot.spotId)
   }
@@ -49,9 +52,19 @@ onBeforeMount(async () => {
 
   traveler.value = await userStore.getUser(tripStore.trip.owner);
 });
+
+async function switchSpot(spotId: string) {
+  spot.value = await tripStore.getSpot(spotId)
+}
 </script>
 
 <style scoped lang="scss">
+.noscroll {
+  position: fixed;
+  overflow: hidden;
+}
+
+
 #map {
   height: 95dvh;
   width: 100vw;
@@ -67,6 +80,12 @@ onBeforeMount(async () => {
   z-index: 999;
 
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+
+  p {
+    text-align: justify;
+    font-size: 1.2rem;
+    margin: 1rem;
+  }
 }
 
 @media screen and (min-width: 1000px) {

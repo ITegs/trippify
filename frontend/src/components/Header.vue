@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import type {Trip, User} from "trippify-client";
+import type {Trip, User} from "trippify-client/api";
 import {useUserStore} from "@/stores/user";
 
 const props = defineProps<{
@@ -23,16 +23,9 @@ const props = defineProps<{
   trip: Trip
 }>()
 
-console.log(props.traveler.profile_pic)
-
 const userStore = useUserStore()
 
 userStore.setUser("joe", "")
-
-const addSpot = () => {
-//   TODO: go to the add spot view
-
-}
 </script>
 
 <style scoped lang="scss">

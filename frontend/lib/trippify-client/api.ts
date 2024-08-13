@@ -126,7 +126,7 @@ export interface NewSpot {
  */
 export interface NewTrip {
     /**
-     * A MongoDB ObjectId
+     * 
      * @type {string}
      * @memberof NewTrip
      */
@@ -156,6 +156,12 @@ export interface NewUser {
      * @memberof NewUser
      */
     'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NewUser
+     */
+    'profile_pic'?: string;
 }
 /**
  * 
@@ -168,7 +174,7 @@ export interface Spot {
      * @type {string}
      * @memberof Spot
      */
-    '_id'?: string;
+    '_id': string;
     /**
      * 
      * @type {string}
@@ -219,11 +225,17 @@ export interface Spot {
  */
 export interface Trip {
     /**
+     * A MongoDB ObjectId
+     * @type {string}
+     * @memberof Trip
+     */
+    '_id': string;
+    /**
      * 
      * @type {string}
      * @memberof Trip
      */
-    'start_date'?: string;
+    'start_date': string;
     /**
      * 
      * @type {string}
@@ -237,7 +249,7 @@ export interface Trip {
      */
     'spots'?: Array<TripSpot>;
     /**
-     * A MongoDB ObjectId
+     * 
      * @type {string}
      * @memberof Trip
      */
@@ -304,6 +316,12 @@ export interface User {
      * @memberof User
      */
     'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof User
+     */
+    'profile_pic'?: string;
 }
 
 /**
