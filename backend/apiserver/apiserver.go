@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ITegs/trippify/database"
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 	"time"
@@ -37,7 +38,13 @@ func (api *apiServer) Main() {
 	}
 
 	fmt.Printf("API server listening on %s\n", server.Addr)
-	server.ListenAndServe()
+
+	// Add CORS support (Cross Origin Resource Sharing)
+	handler := cors.Default().Handler(server.Handler)
+	err := http.ListenAndServe(server.Addr, handler)
+	if err != nil {
+		fmt.Println("SERVER FAILED: ", err)
+	}
 }
 
 type Route struct {
@@ -53,9 +60,9 @@ func (api *apiServer) buildApi() *httprouter.Router {
 		{
 			Method: http.MethodGet,
 			Path:   "/",
-			Handler: http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-				writer.Write([]byte("API is up and running!"))
-				writer.WriteHeader(http.StatusOK)
+			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Write([]byte("API is up and running!"))
+				w.WriteHeader(http.StatusOK)
 			}),
 		},
 		{
@@ -110,7 +117,6 @@ func (api *apiServer) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	w.Header().Add("Access-Control-Allow-Origin", "*") // TODO: Remove
 	w.WriteHeader(http.StatusOK)
 	encoder := json.NewEncoder(w)
 	encoder.SetEscapeHTML(false)
@@ -158,7 +164,6 @@ func (api *apiServer) GetTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	w.Header().Add("Access-Control-Allow-Origin", "*") // TODO: Remove
 	w.WriteHeader(http.StatusOK)
 	encoder := json.NewEncoder(w)
 	encoder.SetEscapeHTML(false)
@@ -242,7 +247,6 @@ func (api *apiServer) GetSpot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	w.Header().Add("Access-Control-Allow-Origin", "*") // TODO: Remove
 	w.WriteHeader(http.StatusOK)
 	encoder := json.NewEncoder(w)
 	encoder.SetEscapeHTML(false)

@@ -18,6 +18,8 @@ services:
       - ./backend:/app:ro
     depends_on:
       - mongodb
+    ports:
+      - 3000:3000
 
   frontend:
     build:

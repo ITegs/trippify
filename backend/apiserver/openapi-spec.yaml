@@ -180,7 +180,12 @@ components:
       allOf:
         - $ref: "#/components/schemas/NewTrip"
       type: object
+      required:
+        - _id
+        - start_date
       properties:
+        _id:
+          $ref: "#/components/schemas/ObjectId"
         start_date:
           type: string
         end_date:
@@ -234,6 +239,8 @@ components:
       allOf:
         - $ref: "#/components/schemas/NewSpot"
       type: object
+      required:
+        - _id
       properties:
         _id:
           $ref: "#/components/schemas/ObjectId"
