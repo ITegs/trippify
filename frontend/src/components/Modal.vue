@@ -244,6 +244,7 @@ useDrag(dragHandler, {
         font-weight: 600;
         white-space: nowrap;
         overflow: scroll;
+        text-overflow: ellipsis;
         font-size: 1.7rem;
       }
 
