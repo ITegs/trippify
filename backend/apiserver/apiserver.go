@@ -109,7 +109,7 @@ func (api *apiServer) GetUser(w http.ResponseWriter, r *http.Request) {
 	p := httprouter.ParamsFromContext(r.Context())
 	userId := p.ByName("username")
 
-	trip, err := api.db.GetUser(userId)
+	trip, err := api.db.GetUserByUsername(userId)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -140,7 +140,7 @@ func (api *apiServer) NewUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = api.db.NewUser(&user)
+	fullUser, err := api.db.NewUser(&user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Println(err)
@@ -149,6 +149,7 @@ func (api *apiServer) NewUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	// TODO: Return the user
+	json.NewEncoder(w).Encode(fullUser)
 	return
 }
 
@@ -162,6 +163,15 @@ func (api *apiServer) GetTrip(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
+
+	owner, err := api.db.GetUserByUsername(trip.Username)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		return
+	}
+
+	trip.Owner = owner
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -180,7 +190,7 @@ func (api *apiServer) GetTrip(w http.ResponseWriter, r *http.Request) {
 func (api *apiServer) NewTrip(w http.ResponseWriter, r *http.Request) {
 	var trip database.Trip
 	err := json.NewDecoder(r.Body).Decode(&trip)
-	if err != nil || trip.Title == "" || trip.Owner == "" {
+	if err != nil || trip.Title == "" || trip.Owner.Username == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println(err)
 		return

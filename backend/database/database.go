@@ -18,7 +18,8 @@ type User struct {
 }
 
 type Trip struct {
-	Owner     string     `json:"owner,omitempty" bson:"owner"`
+	Owner     *User      `json:"owner,omitempty" bson:"owner"`
+	Username  string     `json:"username,omitempty" bson:"username"`
 	Title     string     `json:"title,omitempty" bson:"title"`
 	StartDate string     `json:"start_date" bson:"start_date"`
 	EndDate   string     `json:"end_date" bson:"end_date"`
@@ -74,8 +75,8 @@ type db struct {
 }
 
 type DB interface {
-	GetUser(username string) (*User, error)
-	NewUser(user *User) error
+	GetUserByUsername(username string) (*User, error)
+	NewUser(user *User) (*User, error)
 	GetTrip(tripId string) (*Trip, error)
 	NewTrip(trip *Trip) error
 	AddSpot(spot Spot) error
@@ -113,7 +114,7 @@ func RunMigrations(databaseName string) {
 	initializeDB(database)
 }
 
-func (db *db) GetUser(username string) (*User, error) {
+func (db *db) GetUserByUsername(username string) (*User, error) {
 	result := db.users.FindOne(context.TODO(), bson.D{{Key: "username", Value: username}})
 
 	var user User
@@ -126,14 +127,20 @@ func (db *db) GetUser(username string) (*User, error) {
 	return &user, nil
 }
 
-func (db *db) NewUser(user *User) error {
+func (db *db) NewUser(user *User) (*User, error) {
 	user.Trips = []primitive.ObjectID{}
 	result, err := db.users.InsertOne(context.TODO(), user)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	fmt.Println("Inserted a new user: ", result.InsertedID)
-	return nil
+	fullUser, err := db.GetUserByUsername(user.Username)
+	if err != nil {
+		// TODO: didnt work as planned
+		return nil, err
+	}
+
+	return fullUser, nil
 }
 
 func (db *db) GetTrip(tripId string) (*Trip, error) {
