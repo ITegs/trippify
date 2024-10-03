@@ -130,7 +130,7 @@ export interface NewTrip {
      * @type {string}
      * @memberof NewTrip
      */
-    'owner': string;
+    'username'?: string;
     /**
      * 
      * @type {string}
@@ -232,6 +232,12 @@ export interface Trip {
     '_id': string;
     /**
      * 
+     * @type {User}
+     * @memberof Trip
+     */
+    'owner'?: User;
+    /**
+     * 
      * @type {string}
      * @memberof Trip
      */
@@ -253,7 +259,7 @@ export interface Trip {
      * @type {string}
      * @memberof Trip
      */
-    'owner': string;
+    'username'?: string;
     /**
      * 
      * @type {string}
@@ -651,7 +657,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addSpotToTripPost(tripId: string, newSpot: NewSpot, options?: any): AxiosPromise<Spot> {
+        addSpotToTripPost(tripId: string, newSpot: NewSpot, options?: RawAxiosRequestConfig): AxiosPromise<Spot> {
             return localVarFp.addSpotToTripPost(tripId, newSpot, options).then((request) => request(axios, basePath));
         },
         /**
@@ -661,7 +667,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        newTripPost(newTrip: NewTrip, options?: any): AxiosPromise<Trip> {
+        newTripPost(newTrip: NewTrip, options?: RawAxiosRequestConfig): AxiosPromise<Trip> {
             return localVarFp.newTripPost(newTrip, options).then((request) => request(axios, basePath));
         },
         /**
@@ -671,7 +677,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        newUserPost(newUser: NewUser, options?: any): AxiosPromise<User> {
+        newUserPost(newUser: NewUser, options?: RawAxiosRequestConfig): AxiosPromise<User> {
             return localVarFp.newUserPost(newUser, options).then((request) => request(axios, basePath));
         },
         /**
@@ -681,7 +687,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        spotGet(spotId: string, options?: any): AxiosPromise<Spot> {
+        spotGet(spotId: string, options?: RawAxiosRequestConfig): AxiosPromise<Spot> {
             return localVarFp.spotGet(spotId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -691,7 +697,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        tripGet(tripId: string, options?: any): AxiosPromise<Trip> {
+        tripGet(tripId: string, options?: RawAxiosRequestConfig): AxiosPromise<Trip> {
             return localVarFp.tripGet(tripId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -701,7 +707,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userGet(username: string, options?: any): AxiosPromise<User> {
+        userGet(username: string, options?: RawAxiosRequestConfig): AxiosPromise<User> {
             return localVarFp.userGet(username, options).then((request) => request(axios, basePath));
         },
     };

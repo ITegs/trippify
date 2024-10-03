@@ -171,7 +171,7 @@ components:
         - owner #TODO: Get the user from the auth
         - title
       properties:
-        owner:
+        username:
           $ref: "#/components/schemas/Username"
         title:
           type: string
@@ -186,6 +186,8 @@ components:
       properties:
         _id:
           $ref: "#/components/schemas/ObjectId"
+        owner:
+          $ref: '#/components/schemas/User'
         start_date:
           type: string
         end_date:
