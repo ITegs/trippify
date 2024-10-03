@@ -1,17 +1,17 @@
 <template>
   <div
       id="modal"
-      :style="{ top: yPos + 'px' }"
+      :style="heightMode === 'absolute' ? {top: absYPos + 'px'} : {top: relYPos+ 'dvh'}"
       :class="{
       closed: modalState === ModalState.closed,
       half: modalState === ModalState.half,
-      full: modalState === ModalState.full
+      full: modalState === ModalState.full,
+      animate: heightMode === 'relative'
     }"
   >
-    <div
-        id="head"
-        v-drag="dragHandler"
-        :style="{
+    <div id="head"
+         v-drag="dragHandler"
+         :style="{
         boxShadow: modalState !== ModalState.closed ? '0 0 10px 0 rgba(0, 0, 0, 0.1)' : 'none'
       }"
     >
@@ -22,13 +22,13 @@
 
         <h1>{{ title }}</h1>
 
-        <div v-if="duration !== 0" style="justify-self: right">
+        <div v-if="duration !== 0" style="justify-self: right" class="dateLabel">
           <p v-if="!dateTo">{{ dateFrom.toLocaleDateString('de-DE') }} - Heute</p>
           <p v-else>
             {{ dateFrom.toLocaleDateString('de-DE') }} - {{ dateTo.toLocaleDateString('de-DE') }}
           </p>
         </div>
-        <div v-else style="justify-self: right">
+        <div v-else style="justify-self: right" class="dateLabel">
           <p>Am</p>
         </div>
 
@@ -42,6 +42,12 @@
       </div>
 
       <h2 id="isCurrent" v-if="!dateTo">Aktueller Ort</h2>
+
+      <div class="numPics" :class="modalState !== ModalState.closed ? 'hidden' : ''" v-show="numPics">
+        <p v-if="numPics !== 1">{{ numPics }} Fotos</p>
+        <p v-else>{{ numPics }} Foto</p>
+        <i class="fas fa-chevron-down"/>
+      </div>
     </div>
 
     <div
@@ -60,11 +66,16 @@
 import {onUpdated, ref, type Ref} from 'vue'
 import {useDrag} from '@vueuse/gesture'
 
+const CLOSED_MODAL_PERCENT_HEIGHT = 0.20
+const HALF_MODAL_PERCENT_HEIGHT = 0.55
+const FULL_MODAL_PERCENT_HEIGHT = 0.90
+
 const props = defineProps<{
   pretitle: String
   title: String
   dateFrom: Date
   dateTo: Date | null
+  numPics: Number
 }>()
 
 const today = new Date()
@@ -85,26 +96,31 @@ enum ModalState {
   'full'
 }
 
-const windowHeigth = window.screen.availHeight
-var yPos = ref(windowHeigth - 150)
-let lastY = yPos.value
+const windowHeight = window.screen.height
+const heightMode = ref<"absolute" | "relative">("relative")
+const absYPos = ref(windowHeight * (1 - CLOSED_MODAL_PERCENT_HEIGHT))
+const relYPos = ref(100 - CLOSED_MODAL_PERCENT_HEIGHT * 100)
+let lastY = absYPos.value
 
-var modalState: Ref<ModalState> = ref(ModalState.closed)
+const modalState: Ref<ModalState> = ref(ModalState.closed)
 
 const dragHandler = ({movement: [, y], dragging}: any) => {
+
   if (dragging) {
-    if (yPos.value + y > 40 && yPos.value + y < windowHeigth - 60) {
-      yPos.value = y + lastY
+
+    heightMode.value = "absolute"
+    if (absYPos.value + y > 40 && absYPos.value + y < windowHeight - 60) {
+      absYPos.value = y + lastY
     }
   } else {
-    lastY = yPos.value
-    console.log('Updated: ' + lastY)
+    heightMode.value = "relative"
+    lastY = absYPos.value
 
     switch (modalState.value) {
       case ModalState.closed:
-        if (lastY < windowHeigth / 2) {
+        if (lastY < windowHeight / 2) {
           fullModal()
-        } else if (lastY > windowHeigth - 250) {
+        } else if (lastY > windowHeight - 250) {
           closeModal()
         } else {
           halfModal()
@@ -112,9 +128,9 @@ const dragHandler = ({movement: [, y], dragging}: any) => {
         break
 
       case ModalState.half:
-        if (lastY < windowHeigth / 2 - 150) {
+        if (lastY < windowHeight / 2 - 150) {
           fullModal()
-        } else if (lastY > windowHeigth / 2 - 50) {
+        } else if (lastY > windowHeight / 2 - 50) {
           closeModal()
         } else {
           halfModal()
@@ -122,9 +138,9 @@ const dragHandler = ({movement: [, y], dragging}: any) => {
         break
 
       case ModalState.full:
-        if (lastY > windowHeigth / 2 - 150) {
+        if (lastY > windowHeight / 2 - 150) {
           closeModal()
-        } else if (lastY > windowHeigth / 2 - 250) {
+        } else if (lastY > windowHeight / 2 - 250) {
           halfModal()
         } else {
           fullModal()
@@ -136,39 +152,23 @@ const dragHandler = ({movement: [, y], dragging}: any) => {
 
 function closeModal() {
   modalState.value = ModalState.closed
-  console.log('CLOSE')
-  animateModalScroll(windowHeigth - 170)
+  relYPos.value = 100 - CLOSED_MODAL_PERCENT_HEIGHT * 100
+  absYPos.value = windowHeight * (1 - CLOSED_MODAL_PERCENT_HEIGHT)
+  lastY = absYPos.value
 }
 
 function halfModal() {
   modalState.value = ModalState.half
-  console.log('HALF')
-  animateModalScroll(250)
+  relYPos.value = 100 - HALF_MODAL_PERCENT_HEIGHT * 100
+  absYPos.value = windowHeight * (1 - HALF_MODAL_PERCENT_HEIGHT)
+  lastY = absYPos.value
 }
 
 function fullModal() {
   modalState.value = ModalState.full
-  console.log('FULL')
-  animateModalScroll(60)
-}
-
-function animateModalScroll(to: number) {
-  const scrollLength = Math.abs(yPos.value - to)
-
-  const animationDurationMs = 200
-  const stepSize = scrollLength / animationDurationMs
-
-  for (let i = 0; i < animationDurationMs; i++) {
-    setTimeout(() => {
-      if (yPos.value < to) {
-        yPos.value += stepSize
-      } else {
-        yPos.value -= stepSize
-      }
-    }, i)
-  }
-
-  lastY = to
+  relYPos.value = 100 - FULL_MODAL_PERCENT_HEIGHT * 100
+  absYPos.value = windowHeight * (1 - FULL_MODAL_PERCENT_HEIGHT)
+  lastY = absYPos.value
 }
 
 useDrag(dragHandler, {
@@ -194,6 +194,10 @@ useDrag(dragHandler, {
       grid-template-rows: 1fr !important;
 
       p {
+        display: none
+      }
+
+      .dateLabel {
         display: none;
       }
     }
@@ -202,10 +206,13 @@ useDrag(dragHandler, {
 
 #modal {
   background-color: var(--color-background);
-  transition: height 0.5s ease-in-out;
   border-radius: 20px 20px 0 0;
   overflow-y: hidden;
   position: relative;
+
+  &.animate {
+    transition: top 0.2s ease-out;
+  }
 
   #head {
     width: 100%;
@@ -230,12 +237,15 @@ useDrag(dragHandler, {
       grid-template-rows: 1fr 1fr;
       grid-auto-flow: column;
       align-items: end;
+      padding-top: 0.5rem;
       padding-inline: 1rem;
 
       p {
         color: var(--color-text-light);
         font-size: 0.8rem;
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       h1 {
@@ -243,15 +253,15 @@ useDrag(dragHandler, {
         font-family: Arvo;
         font-weight: 600;
         white-space: nowrap;
-        overflow: scroll;
+        overflow: hidden;
         text-overflow: ellipsis;
-        font-size: 1.7rem;
+        font-size: 1.5rem;
       }
 
       h2 {
         color: var(--color-primary);
         font-family: Arvo;
-        font-size: 1.5rem;
+        font-size: 1.2rem;
       }
     }
 
@@ -262,6 +272,25 @@ useDrag(dragHandler, {
       padding-left: 1rem;
       position: relative;
       top: -0.2rem;
+    }
+
+    .numPics {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 1;
+
+      p {
+        font-style: italic;
+      }
+
+      &.hidden {
+        height: 0;
+        opacity: 0;
+        //transform: translateY(-30px);
+        transition: all 0.2s ease-in-out;
+      }
     }
   }
 
