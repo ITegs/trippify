@@ -1,9 +1,8 @@
 <template>
   <div class="noscroll">
-    <Header :trip="tripStore.trip as Trip" :traveler="traveler as User"/>
-    <Map id="map" :marker="marker" @changedSpot="changeSpot"/>
+    <Map id="homeMap" :marker="marker" @changedSpot="changeSpot"/>
     <Modal id="modal" :pretitle="`${spot.latitude} // ${spot.longitude}`" :title="spot.title" :dateFrom="dateFrom"
-           :dateTo="dateTo">
+           :dateTo="dateTo" :num-pics="spot.images.length">
       <template #content>
         <TripCarousel :spot="spot"/>
         <p>{{ spot.description }}</p>
@@ -15,17 +14,14 @@
 <script setup lang="ts">
 import {onBeforeMount, ref, type Ref} from 'vue'
 
-import Header from "@/components/Header.vue";
 import Map from '@/components/Map.vue'
 import Modal from '@/components/Modal.vue'
 import TripCarousel from '@/components/TripCarousel.vue'
 import {useTripStore} from '@/stores/trip'
-import type {Spot, Trip, User} from "trippify-client/api";
+import type {Spot} from "trippify-client/api";
 import {type LatLngTuple} from "leaflet";
-import {useUserStore} from "@/stores/user";
 
 const tripStore = useTripStore()
-const userStore = useUserStore()
 
 const spot: Ref<Spot> = ref({} as Spot);
 const dateFrom: Ref<Date> = ref(new Date())
@@ -39,18 +35,16 @@ type Marker = {
 
 const marker: Ref<Marker[]> = ref([] as Marker[])
 
-const traveler: Ref<User> = ref({} as User)
-
 onBeforeMount(async () => {
-  await tripStore.setTrip('66b3df242162953c2a527d20');
-  const firstSpot = tripStore.trip.spots?.[tripStore.trip.spots.length - 1]
+  await tripStore.setTrip('66dde729394be9748a284296');
+  const firstSpot = tripStore.trip.spots?.[tripStore.trip.spots?.length - 1]
   if (firstSpot) {
     spot.value = await tripStore.getSpot(firstSpot.spotId)
   }
 
   dateFrom.value = new Date(spot.value.date_from);
   if (spot.value.date_to) {
-    dateTo.value = new Date(spot.value.date_to)
+    dateTo.value = new Date(spot.value.date_to!)
   }
 
   if (tripStore.trip.spots) {
@@ -59,12 +53,15 @@ onBeforeMount(async () => {
     })
   }
 
-
-  traveler.value = await userStore.getUser(tripStore.trip.owner);
 });
 
 async function changeSpot(spotId: string) {
   spot.value = await tripStore.getSpot(spotId)
+
+  dateFrom.value = new Date(spot.value.date_from);
+  if (spot.value.date_to) {
+    dateTo.value = new Date(spot.value.date_to!)
+  }
 }
 </script>
 
@@ -75,9 +72,10 @@ async function changeSpot(spotId: string) {
 }
 
 
-#map {
-  height: 95dvh;
+#homeMap {
+  height: 100dvh;
   width: 100vw;
+  z-index: 0;
 }
 
 #modal {
@@ -87,7 +85,7 @@ async function changeSpot(spotId: string) {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 999;
+  z-index: 300;
 
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 

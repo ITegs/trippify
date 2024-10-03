@@ -31,6 +31,13 @@ import {ref} from "vue";
 import type {NewSpot} from "trippify-client";
 import {useTripStore} from "@/stores/trip";
 
+/* Lat/Lon accuracy by decimal places:
+* 3 decimal places: ~111 meters
+* 4 decimal places: ~11.1 meters
+* 5 decimal places: ~1.11 meters
+*/
+const POSITIONING_ACCURACY = 1000 // -> 11.1m
+
 const tripStore = useTripStore()
 
 const spot = ref<NewSpot>({
@@ -52,7 +59,15 @@ function back() {
 function getLocation() {
   if (navigator.geolocation) {
     console.log("Getting location...")
-    navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => (spot.value.latitude = position.coords.latitude, spot.value.longitude = position.coords.longitude));
+    navigator.geolocation.getCurrentPosition(
+        (position: GeolocationPosition) => {
+          const lat = Math.round(position.coords.latitude * POSITIONING_ACCURACY) / POSITIONING_ACCURACY
+          const lon = Math.round(position.coords.longitude * POSITIONING_ACCURACY) / POSITIONING_ACCURACY
+
+          spot.value.latitude = lat
+          spot.value.longitude = lon
+        }
+    )
   } else {
     console.log("Geolocation is not supported");
   }
@@ -81,7 +96,7 @@ function get32BitTimestamp() {
   const milliseconds = Date.now();
   let seconds = Math.floor(milliseconds / 1000);
 
-  return seconds & 0xFFFFFFFF; // Use bitwise AND to simulate 32-bit overflow
+  return seconds & 0xFFFFFFFF;
 }
 
 function removeImage($event: Event) {
@@ -93,7 +108,7 @@ function removeImage($event: Event) {
 
 function submit() {
   if (spot.value.title.length > 0 && spot.value.latitude != 0 && spot.value.longitude != 0 && spot.value.images.length > 0) {
-    tripStore.addSpotToTrip("66b3df242162953c2a527d20", spot.value).then(
+    tripStore.addSpotToTrip("66dde729394be9748a284296", spot.value).then(
         () => window.location.href = "/"
     )
   } else {

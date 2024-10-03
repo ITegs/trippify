@@ -2,7 +2,7 @@
   <div class="container">
     <swiper class="swiper" :autoHeight="true" :slidesPerView="1" :spaceBetween="30">
       <swiper-slide class="slide" v-for="img in spot.images" :key="img.timestamp">
-        <img :src="img.source"/>
+        <img :src="img.source" alt="A very nice picture!"/>
       </swiper-slide>
     </swiper>
   </div>
