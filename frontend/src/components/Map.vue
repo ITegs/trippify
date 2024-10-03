@@ -1,10 +1,14 @@
 <template>
-  <div id="map"/>
+  <div>
+    <MapOverlay id="mapOverlay"/>
+    <div id="map"/>
+  </div>
 </template>
 
 <script setup lang="ts">
 import {onMounted, watch} from 'vue'
 import L, {type LatLngTuple} from 'leaflet'
+import MapOverlay from "@/components/MapOverlay.vue";
 
 type Marker = {
   spotId: string,
@@ -16,11 +20,10 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  changedSpot: [string]
+  (e: 'changedSpot', spotId: string): void
 }>()
 
 let map: L.Map
-
 
 onMounted(() => {
   const initialView: L.LatLngExpression = [48.13807, 11.57523]
@@ -31,7 +34,7 @@ onMounted(() => {
   }).addTo(map)
 
   map.zoomControl.remove()
-  map.attributionControl.setPosition('topleft')
+  // map.attributionControl.setPosition('topleft') //TODO
 })
 
 watch(() => props.marker, (newMarkers) => {
@@ -91,5 +94,16 @@ function handleMarkerClick(spotId: string) {
 </script>
 
 <style scoped lang="scss">
-//
+#mapOverlay {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: 100;
+}
+
+
+#map {
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
 </style>
