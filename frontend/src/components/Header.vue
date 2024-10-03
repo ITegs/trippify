@@ -2,30 +2,24 @@
   <div class="header">
     <h1>trippify</h1>
     <div class="trip">
-      <p><u>{{ traveler.name }}</u> ist unterwegs:</p>
+      <p>
+        <u>{{ trip.owner.name }}</u> ist unterwegs:
+      </p>
       <b>{{ trip.title }}</b>
     </div>
     <div class="profilePic">
-      <img :src="traveler.profile_pic" alt="Profile picture"/>
+      <img :src="trip.owner.profile_pic" alt="Profile picture"/>
     </div>
   </div>
-  <a v-if="userStore.user.username === trip.owner" class="addSpot" href="/addSpot">
-    <img src="../assets/icons/plus-solid.svg" alt="plus-solid"/>
-  </a>
 </template>
 
 <script setup lang="ts">
-import type {Trip, User} from "trippify-client/api";
-import {useUserStore} from "@/stores/user";
+import type {Trip} from 'trippify-client/api'
 
 const props = defineProps<{
-  traveler: User
   trip: Trip
 }>()
 
-const userStore = useUserStore()
-
-userStore.setUser("joe", "")
 </script>
 
 <style scoped lang="scss">
@@ -34,12 +28,9 @@ userStore.setUser("joe", "")
   //flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  background-color: transparent;
-  height: 5dvh;
-  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.9);
   position: relative;
   z-index: 900;
-
 
   h1 {
     display: flex;
@@ -71,19 +62,19 @@ userStore.setUser("joe", "")
   }
 
   .profilePic {
-    aspect-ratio: 1;
-    height: 10dvh;
-    border-radius: 50%;
-    overflow: hidden;
-    background-color: var(--color-background);
-    margin-right: 10px;
     position: relative;
     top: 2.5dvh;
+    margin-right: 10px;
+    height: 80px;
+
     z-index: 901;
+    border-radius: 50%;
+    aspect-ratio: 1;
+    background-color: var(--color-background);
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-
 
     img {
       width: 80%;
@@ -91,31 +82,9 @@ userStore.setUser("joe", "")
       border-radius: 50%;
       aspect-ratio: 1;
       object-fit: cover;
-
     }
   }
 }
 
-.addSpot {
-  position: absolute;
-  top: 13dvh;
-  right: 2.5dvh;
-  aspect-ratio: 1;
-  height: 5dvh;
-  border-radius: 50%;
-  overflow: hidden;
-  background-color: var(--color-primary);
-  margin-right: 10px;
-  z-index: 901;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 
-  img {
-    width: 60%;
-    height: 60%;
-    aspect-ratio: 1;
-  }
-}
 </style>
