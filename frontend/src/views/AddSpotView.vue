@@ -1,35 +1,57 @@
 <template>
   <main>
-    <div class="back" @click="back">
-      <i class="fas fa-arrow-left"/>
-      Back
-    </div>
-    <h1>Add a spot</h1>
-    <hr/>
-    <input type="text" v-model="spot.title" placeholder="Where are you?" class="location"/>
-    <div class="geolocation">
-      <button @click="getLocation">Get coordinates</button>
-      <p><input type="number" v-model="spot.latitude"/>Lat <input type="number" v-model="spot.longitude"/>Lon</p>
-    </div>
-    <input type="file" accept="image/*" multiple @change="onFileChanged($event)"
-           placeholder="Add images"/>
-    <div class="selectedImages">
-      <img v-for="image in spot.images" :id="image.timestamp?.toString()" :key="image.timestamp" :src="image.source"
-           @dblclick="removeImage($event)">
+    <div class="head">
+      <div class="back" @click="goBack">
+        <i class="fas fa-chevron-left"/>
+        Zurück
+      </div>
+      <p>Neuer Spot</p>
     </div>
 
-    <textarea v-model="spot.description" placeholder="Tell us what you did here!"/>
+    <input type="text" v-model="spot.title" placeholder="Wo bist du?" class="location"/>
 
-    <p class="status">{{ status }}</p>
-    <button @click="submit" class="submit">Submit</button>
+    <div class="map">
+      <SmallMap :position="[spot.latitude, spot.longitude]" :marker="[[spot.latitude, spot.longitude]]"
+                :draggable="false" class="mapC"
+                v-if="spot.latitude !== 0 && spot.longitude !== 0"/>
+      <p v-else>Standort läd...</p>
+      <div class="refresh" @click="getLocation">
+        <i class="fas fa-sync"/>
+      </div>
+    </div>
+
+    <div class="images">
+      <div v-for="image in spot.images" :id="image.timestamp?.toString()" :key="image.timestamp" class="image">
+        <span class="removeImg" @click="removeImage($event)">
+          <i class="fas fa-times"/>
+        </span>
+        <img :src="image.source" alt="A very nice picture"/>
+      </div>
+      <span class="addImg" @click="triggerFileInput">
+        <i class="fas fa-2x fa-plus"/>
+      </span>
+    </div>
+    <input type="file" accept="image/*" multiple @change="onFileChanged($event)" ref="imageUpload" v-show="false"/>
+
+    <div class="description">
+      <p>Beschreibung</p>
+      <textarea v-model="spot.description" placeholder="Tell us what you did here!"/>
+    </div>
+
+    <div class="submit">
+      <p class="status">{{ status }}</p>
+      <button @click="submit">Hochladen</button>
+    </div>
 
   </main>
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import type {NewSpot} from "trippify-client";
 import {useTripStore} from "@/stores/trip";
+import router from "@/router";
+import SmallMap from "@/components/SmallMap.vue";
 
 /* Lat/Lon accuracy by decimal places:
 * 3 decimal places: ~111 meters
@@ -40,6 +62,7 @@ const POSITIONING_ACCURACY = 1000 // -> 11.1m
 
 const tripStore = useTripStore()
 
+
 const spot = ref<NewSpot>({
   title: "",
   latitude: 0,
@@ -49,11 +72,24 @@ const spot = ref<NewSpot>({
   images: [],
 })
 
+const imageUpload = ref<HTMLInputElement | null>(null)
+
+function triggerFileInput() {
+  if (imageUpload.value) {
+    imageUpload.value.click()
+  }
+}
+
 const status = ref<string>(" ")
 
-function back() {
-  window.history.back()
+
+function goBack() {
+  router.back()
 }
+
+onMounted(() =>
+    getLocation()
+)
 
 
 function getLocation() {
@@ -99,7 +135,7 @@ function get32BitTimestamp() {
   return seconds & 0xFFFFFFFF;
 }
 
-function removeImage($event: Event) {
+function removeImage($event: Event) { // TODO: fix
   const target = $event.target as HTMLImageElement;
   const timestamp = Number(target.id)
   const newArr = spot.value.images.filter((image) => image.timestamp !== timestamp)
@@ -116,108 +152,263 @@ function submit() {
 
     setTimeout(() => {
       status.value = " "
-    }, 2000)
+    }, 3000)
   }
 }
 </script>
 
 <style scoped lang="scss">
 main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  // Noscroll
+  //position: fixed;
+  //overflow: hidden;
+  width: 100%;
 
-  .back {
-    margin-top: 2rem;
-    margin-left: 2rem;
-    display: flex;
-    flex-direction: row;
+  margin-top: 4rem;
+  padding-inline: 1rem;
+
+  .head {
+    display: grid;
+    grid-template-columns: 100px 1fr 100px;
     align-items: center;
-    gap: 1rem;
-    align-self: flex-start;
-  }
+    justify-items: center;
 
+    position: fixed;
 
-  h1 {
-    font-family: Arvo;
-    margin-top: 2rem;
-    font-weight: bolder;
-  }
-
-  hr {
-    border: 1px solid var(--color-accent);
-    width: 100%;
-    margin: 1rem;
-  }
-
-  .location {
-    border: none;
-    outline: none;
-    font-family: Arvo;
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-align: center;
-    margin-block: 1rem;
-    background-color: var(--color-background);
-  }
-
-  button {
-    outline: none;
-    background-color: var(--color-background);
-    border: 1px solid var(--color-primary);
-    padding: 0.5rem 1rem;
-    border-radius: 10px;
-    font-weight: bold;
-    margin: 1rem;
-  }
-
-  .geolocation {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-block: 1rem;
+    .back {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+      justify-self: flex-start;
+    }
 
 
     p {
-      font-size: 0.8rem;
+      font-family: Arvo;
+      font-weight: 700;
+    }
+  }
 
-      input {
-        border: none;
-        outline: none;
-        text-align: right;
-        background-color: var(--color-background);
+  .location {
+    margin-top: 1rem;
+
+    position: relative;
+    top: 1rem;
+    z-index: 1;
+
+    font-family: Arvo;
+    font-size: 1.5rem;
+    font-weight: 900;
+
+    width: 100%;
+    background-color: transparent;
+    color: var(--color-accent);
+    border: none;
+    outline: none;
+
+    &::placeholder {
+      color: var(--color-accent);
+      opacity: 0.5;
+    }
+
+    &::-ms-input-placeholder {
+      color: var(--color-accent);
+      opacity: 0.5;
+    }
+  }
+
+  .map {
+    height: 25vh;
+    background-color: var(--color-primary);
+    border-radius: 20px;
+
+    position: relative;
+
+    .mapC {
+      //height: 25vh;
+      height: 100%;
+      z-index: 0;
+      border-radius: 20px;
+    }
+
+    p {
+      position: absolute;
+      text-align: center;
+      width: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+
+      font-family: Arvo;
+      font-size: 1rem;
+      font-weight: 900;
+      color: #D9D9D9;
+
+      animation: loading 1.5s infinite linear;
+    }
+
+    .refresh {
+      position: absolute;
+      left: calc(100% - 45px);
+      top: calc(100% - 45px);
+      z-index: 1;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--color-text);
+
+      height: 35px;
+      border-radius: 50%;
+      aspect-ratio: 1;
+
+      i {
+        color: var(--color-background);
       }
     }
   }
 
-
-  .selectedImages {
-    margin-block: 1rem;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(200px, 1fr));
+  .images {
+    display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
 
-    img {
+    height: 25vh;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    margin-inline: -1rem;
+    padding-inline: 1rem;
+
+    margin-block: 1rem;
+
+    .image {
+      position: relative;
+      height: 100%;
+
+      img {
+        height: 100%;
+        object-fit: cover;
+        border-radius: 20px;
+      }
+
+      .removeImg {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 100;
+
+        height: 20px;
+        width: 20px;
+        background-color: var(--color-primary);
+        color: var(--color-background);
+        border-radius: 50%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .addImg {
+      height: 100%;
+      aspect-ratio: 2/3;
+      border-radius: 20px;
+      background-color: #D9D9D9;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      i {
+        color: var(--color-accent);
+      }
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .description {
+    width: 100%;
+    height: 20vh;
+    padding: 1rem;
+
+    background-color: #D9D9D9;
+    color: var(--color-text);
+    font-family: Lato;
+    font-size: 1rem;
+    border-radius: 20px;
+
+    p {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    textarea {
+      border: none;
+      outline: none;
       width: 100%;
-      height: auto
+      height: 80%;
+
+      background-color: #D9D9D9;
+      font-family: Lato;
+
+      font-size: 1rem;
+      margin: 0;
+      padding: 0;
+
+      &::placeholder {
+        color: var(--color-text);
+        opacity: 0.5;
+      }
+
+      &::-ms-input-placeholder {
+        color: var(--color-text);
+        opacity: 0.5;
+      }
     }
   }
 
+  .submit {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 
-  textarea {
-    width: 90%;
-    height: 20vh;
     margin-block: 1rem;
-    border: none;
-    outline: none;
-    background-color: var(--color-background);
-  }
 
-  .status {
-    margin-bottom: 1rem;
-    color: var(--color-accent);
+    .status {
+      color: var(--color-accent);
+    }
+
+    button {
+      background-color: var(--color-primary);
+      color: var(--color-background);
+      outline: none;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: Lato;
+      font-weight: 700;
+    }
+  }
+}
+
+@keyframes loading {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
   }
 }
 </style>

@@ -1,21 +1,21 @@
-
 <template>
   <div class="container">
 
     <div class="addSpot" v-if="userStore.user._id === tripStore.trip.owner?._id" @click="goToAddSpot">
-        <i class="fas fa-1x fa-plus" />
+      <i class="fas fa-1x fa-plus"/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import {useUserStore} from "@/stores/user";
-import type {Trip} from "trippify-client";
 import {useTripStore} from "@/stores/trip";
 import router from "@/router";
 
-function goToAddSpot(){
-  router.push('/addSpot')
+function goToAddSpot() {
+  // router.push({ path: '/addSpot' })
+  // router.go(1)
+  window.location.href = "/addSpot"
 }
 
 
@@ -25,16 +25,13 @@ const tripStore = useTripStore()
 userStore.setUser('joe', '')
 
 
-const props = defineProps<{
-  trip: Trip
-}>()
-
 </script>
 
 
 <style scoped lang="scss">
 .container {
   pointer-events: none;
+
   * {
     pointer-events: all;
   }
@@ -60,9 +57,8 @@ const props = defineProps<{
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow:
-        rgba(0, 0, 0, 0.1) 0 4px 6px -1px,
-        rgba(0, 0, 0, 0.06) 0 2px 4px -1px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 4px 6px -1px,
+    rgba(0, 0, 0, 0.06) 0 2px 4px -1px;
   }
 }
 </style>

@@ -28,7 +28,7 @@ const props = defineProps<{
   //flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255, 255, 255, 0.9);
+  background-color: rgba(#f8fcfa, 0.85);
   position: relative;
   z-index: 900;
 

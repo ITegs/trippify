@@ -32,7 +32,6 @@ type Marker = {
   latLng: LatLngTuple
 }
 
-
 const marker: Ref<Marker[]> = ref([] as Marker[])
 
 onBeforeMount(async () => {
@@ -90,15 +89,15 @@ async function changeSpot(spotId: string) {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 
   p {
-    text-align: justify;
-    font-size: 1.2rem;
+    //text-align: justify;
+    font-size: 1rem;
     margin: 1rem;
   }
 }
 
 @media screen and (min-width: 1000px) {
   #modal {
-    width: 40%;
+    width: 30%;
 
     position: absolute;
     bottom: 0;

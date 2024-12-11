@@ -7,7 +7,10 @@
 
 <script setup lang="ts">
 import {onMounted, watch} from 'vue'
-import L, {type LatLngTuple} from 'leaflet'
+import * as L from 'leaflet'
+import type {LatLngTuple} from "leaflet";
+import 'leaflet-doubletapdrag';
+import 'leaflet-doubletapdragzoom';
 import MapOverlay from "@/components/MapOverlay.vue";
 
 type Marker = {
@@ -27,7 +30,13 @@ let map: L.Map
 
 onMounted(() => {
   const initialView: L.LatLngExpression = [48.13807, 11.57523]
-  map = L.map('map').setView(initialView, 13)
+  map = L.map('map', {
+    // @ts-ignore
+    doubleTapDragZoom: 'center',
+    doubleTapDragZoomOptions: {
+      reverse: false,
+    },
+  }).setView(initialView, 5)
   L.tileLayer(import.meta.env.VITE_TILE_URL + import.meta.env.VITE_TILE_KEY, {
     maxZoom: 19,
     attribution: import.meta.env.VITE_MAP_ATTRIBUTION
@@ -38,11 +47,10 @@ onMounted(() => {
 })
 
 watch(() => props.marker, (newMarkers) => {
-  drawMarker(props.marker, map)
   drawPath(props.marker, map)
+  drawMarker(props.marker, map)
   setViewToCenter(props.marker, map)
 })
-
 
 function drawMarker(marker: Marker[], map: L.Map) {
   const markerOptions: L.CircleMarkerOptions = {
@@ -59,7 +67,6 @@ function drawMarker(marker: Marker[], map: L.Map) {
   })
 }
 
-
 function drawPath(marker: Marker[], map: L.Map) {
   const pathOptions: L.PolylineOptions = {
     color: '#fb7646',
@@ -74,10 +81,9 @@ function drawPath(marker: Marker[], map: L.Map) {
   L.polyline(latLngs, pathOptions).addTo(map)
 }
 
-
 function setViewToCenter(marker: Marker[], map: L.Map) {
   const fitBoundsOptions: L.FitBoundsOptions = {
-    padding: [70, 0],
+    paddingBottomRight: [0, 120],
   }
 
   const latLngs: LatLngTuple[] = marker.map((m) => {

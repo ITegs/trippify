@@ -98,16 +98,14 @@ enum ModalState {
 
 const windowHeight = window.screen.height
 const heightMode = ref<"absolute" | "relative">("relative")
-const absYPos = ref(windowHeight * (1 - CLOSED_MODAL_PERCENT_HEIGHT))
 const relYPos = ref(100 - CLOSED_MODAL_PERCENT_HEIGHT * 100)
+const absYPos = ref(windowHeight * (1 - CLOSED_MODAL_PERCENT_HEIGHT))
 let lastY = absYPos.value
 
 const modalState: Ref<ModalState> = ref(ModalState.closed)
 
 const dragHandler = ({movement: [, y], dragging}: any) => {
-
   if (dragging) {
-
     heightMode.value = "absolute"
     if (absYPos.value + y > 40 && absYPos.value + y < windowHeight - 60) {
       absYPos.value = y + lastY
@@ -185,6 +183,11 @@ useDrag(dragHandler, {
 }
 
 .half {
+  .content {
+    :deep p {
+      display: none;
+    }
+  }
 }
 
 .full,
@@ -192,6 +195,7 @@ useDrag(dragHandler, {
   #head {
     .title {
       grid-template-rows: 1fr !important;
+      //padding-bottom: 0.5rem;
 
       p {
         display: none
@@ -221,7 +225,7 @@ useDrag(dragHandler, {
     flex-direction: column;
     align-items: center;
     padding-top: 1rem;
-    padding-bottom: 0.5rem;
+    padding-bottom: 1rem;
 
     .pull-line {
       height: 4px;
@@ -295,7 +299,7 @@ useDrag(dragHandler, {
   }
 
   .content {
-    height: 53vh;
+    //height: 63dvh;
     padding-block: 2rem;
     overflow-y: auto;
     transition: all 0.5s ease-in-out;

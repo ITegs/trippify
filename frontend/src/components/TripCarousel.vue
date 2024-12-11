@@ -27,7 +27,7 @@ const props = defineProps<{
   flex-direction: column;
 
   img {
-    height: 40dvh;
+    height: 43dvh;
     width: 100%;
     object-fit: cover;
     border-radius: 0 0 20px 20px;
