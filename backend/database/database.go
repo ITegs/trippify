@@ -53,7 +53,11 @@ var mCl *mongo.Client
 
 func init() {
 	fmt.Println("Initializing the DB")
-	clientOptions := options.Client().ApplyURI(os.Getenv("DATABASE_URI"))
+
+	dbUri := os.Getenv("DATABASE_URI")
+	fmt.Println("DB-Uri: " + dbUri)
+
+	clientOptions := options.Client().ApplyURI(dbUri)
 	mongoClient, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		fmt.Println("Failed to init the db")
