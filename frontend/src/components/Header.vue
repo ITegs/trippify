@@ -1,13 +1,13 @@
 <template>
   <div class="header">
     <h1>trippify</h1>
-    <div class="trip">
+    <div v-if="trip?.owner" class="tripInfo">
       <p>
         <u>{{ trip.owner.name }}</u> ist unterwegs:
       </p>
       <b>{{ trip.title }}</b>
     </div>
-    <div class="profilePic">
+    <div v-if="trip?.owner" class="profilePic">
       <img :src="trip.owner.profile_pic" alt="Profile picture"/>
     </div>
   </div>
@@ -17,7 +17,7 @@
 import type {Trip} from 'trippify-client/api'
 
 const props = defineProps<{
-  trip: Trip
+  trip?: Trip
 }>()
 
 </script>
@@ -43,7 +43,7 @@ const props = defineProps<{
     font-size: 1.2rem;
   }
 
-  .trip {
+  .tripInfo {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -85,6 +85,5 @@ const props = defineProps<{
     }
   }
 }
-
 
 </style>

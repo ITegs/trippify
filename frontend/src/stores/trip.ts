@@ -9,40 +9,68 @@ export const useTripStore = defineStore('trip', {
   }),
 
   getters: {
-    // getSpot: (state) => (id: string) => {
-    //   return state.spots.find((a) => a._id === id)
-    // },
+    getTrip: (state) => state.trip,
+    getSpot: (state) => (id: string) => {
+      return state.spots.find((spot) => spot._id === id);
+    }
   },
 
   actions: {
+    async init() {
+      await this.setToFirstTrip()
+    },
+
+    async setToFirstTrip() {
+      const api = new DefaultApi();
+      try {
+        const trip: Trip = (await api.firstTripGet()).data
+        this.$patch({trip})
+      } catch (e) {
+        console.error('Error fetching trip:', e);
+        return Promise.reject(e);
+      }
+    },
+
     async setTrip(tripId: string) {
       const api = new DefaultApi()
-      const trip: Trip = (await api.tripGet(tripId)).data
-      this.$patch({trip})
+      try {
+        const trip: Trip = (await api.tripGet(tripId)).data;
+        this.$patch({trip});
+      } catch (e) {
+        console.error('Error fetching trip:', e);
+        return Promise.reject(e);
+      }
     },
 
     async addSpotToTrip(tripId: string, spot: NewSpot) {
-      const api = new DefaultApi()
-
+      const api = new DefaultApi();
       try {
-        return (await api.addSpotToTripPost(tripId, spot)).data
+        const newSpot = (await api.addSpotToTripPost(tripId, spot)).data;
+        this.spots.push(newSpot);
+        return newSpot;
       } catch (e) {
-        return Promise.reject(e)
+        console.error('Error adding spot to trip:', e);
+        return Promise.reject(e);
       }
     },
 
-    async getSpot(spotId: string) {
-      const spot = this.spots.find((s) => s._id === spotId)
-      if (spot) {
-        return spot
+    async fetchSpot(spotId: string) {
+      const existingSpot = this.spots.find((s) => s._id === spotId);
+      if (existingSpot) {
+        return existingSpot;
       }
 
-      const api = new DefaultApi()
-      const fetchedSpot = (await api.spotGet(spotId)).data
-      this.$patch(state => {
-        state.spots.push(fetchedSpot);
-      });
-      return fetchedSpot
+      const api = new DefaultApi();
+      try {
+        const spot: Spot = (await api.spotGet(spotId)).data;
+        this.$patch((state) => {
+          state.spots.push(spot);
+        });
+        return spot;
+      } catch (e) {
+        console.error('Error fetching spot:', e);
+        return Promise.reject(e);
+      }
     }
   }
-})
+});

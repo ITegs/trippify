@@ -11,13 +11,18 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/:pathMatch(.*)*',
+      redirect: '/'
+    },
+    {
       path: '/addSpot',
       name: 'addSpot',
       component: AddSpotView
     },
     {
-      path: '/:pathMatch(.*)*',
-      redirect: '/'
+      path: '/trip/:tripId',
+      name: 'trip',
+      component: HomeView
     }
   ]
 })
