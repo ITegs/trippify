@@ -2,7 +2,7 @@
   <div class="container">
 
     <div class="addSpot" v-if="userStore.user._id === tripStore.trip.owner?._id" @click="goToAddSpot">
-      <i class="fas fa-1x fa-plus"/>
+      <font-awesome-icon :icon="['fas', 'plus']" />
     </div>
   </div>
 </template>

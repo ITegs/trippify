@@ -2,7 +2,7 @@
   <main>
     <div class="head">
       <div class="back" @click="goBack">
-        <i class="fas fa-chevron-left"/>
+        <font-awesome-icon :icon="['fas', 'chevron-left']"/>
         Zurück
       </div>
       <p>Neuer Spot</p>
@@ -16,19 +16,19 @@
                 v-if="spot.latitude !== 0 && spot.longitude !== 0"/>
       <p v-else>Standort läd...</p>
       <div class="refresh" @click="getLocation">
-        <i class="fas fa-sync"/>
+        <font-awesome-icon :icon="['fas', 'sync']" inverse/>
       </div>
     </div>
 
     <div class="images">
       <div v-for="image in spot.images" :id="image.timestamp?.toString()" :key="image.timestamp" class="image">
         <span class="removeImg" @click="removeImage($event)">
-          <i class="fas fa-times"/>
+          <font-awesome-icon :icon="['fas', 'times']"/>
         </span>
         <img :src="image.source" alt="A very nice picture"/>
       </div>
       <span class="addImg" @click="triggerFileInput">
-        <i class="fas fa-2x fa-plus"/>
+      <font-awesome-icon :icon="['fas', 'plus']" size="2x"/>
       </span>
     </div>
     <input type="file" accept="image/*" multiple @change="onFileChanged($event)" ref="imageUpload" v-show="false"/>
@@ -261,10 +261,6 @@ main {
       height: 35px;
       border-radius: 50%;
       aspect-ratio: 1;
-
-      i {
-        color: var(--color-background);
-      }
     }
   }
 
@@ -319,10 +315,6 @@ main {
       display: flex;
       align-items: center;
       justify-content: center;
-
-      i {
-        color: var(--color-accent);
-      }
     }
 
     &::-webkit-scrollbar {

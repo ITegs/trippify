@@ -46,7 +46,7 @@
       <div class="numPics" :class="modalState !== ModalState.closed ? 'hidden' : ''" v-show="numPics">
         <p v-if="numPics !== 1">{{ numPics }} Fotos</p>
         <p v-else>{{ numPics }} Foto</p>
-        <i class="fas fa-chevron-down"/>
+        <font-awesome-icon :icon="['fas', 'chevron-down']" />
       </div>
     </div>
 
