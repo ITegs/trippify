@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -52,7 +53,7 @@ var mCl *mongo.Client
 
 func init() {
 	fmt.Println("Initializing the DB")
-	clientOptions := options.Client().ApplyURI("mongodb://mongodb:27017/")
+	clientOptions := options.Client().ApplyURI(os.Getenv("DATABASE_URI"))
 	mongoClient, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		fmt.Println("Failed to init the db")
