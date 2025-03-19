@@ -378,6 +378,36 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Get the firstTrip
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        firstTripGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/firstTrip`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Create a new trip
          * @param {NewTrip} newTrip 
          * @param {*} [options] Override http request option.
@@ -576,6 +606,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get the firstTrip
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async firstTripGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Trip>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.firstTripGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.firstTripGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Create a new trip
          * @param {NewTrip} newTrip 
          * @param {*} [options] Override http request option.
@@ -662,6 +704,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary Get the firstTrip
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        firstTripGet(options?: RawAxiosRequestConfig): AxiosPromise<Trip> {
+            return localVarFp.firstTripGet(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Create a new trip
          * @param {NewTrip} newTrip 
          * @param {*} [options] Override http request option.
@@ -731,6 +782,17 @@ export class DefaultApi extends BaseAPI {
      */
     public addSpotToTripPost(tripId: string, newSpot: NewSpot, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).addSpotToTripPost(tripId, newSpot, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get the firstTrip
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public firstTripGet(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).firstTripGet(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

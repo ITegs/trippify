@@ -77,6 +77,7 @@ type db struct {
 type DB interface {
 	GetUserByUsername(username string) (*User, error)
 	NewUser(user *User) (*User, error)
+	GetFirstTrip() (*Trip, error)
 	GetTrip(tripId string) (*Trip, error)
 	NewTrip(trip *Trip) error
 	AddSpot(spot Spot) error
@@ -141,6 +142,18 @@ func (db *db) NewUser(user *User) (*User, error) {
 	}
 
 	return fullUser, nil
+}
+
+func (db *db) GetFirstTrip() (*Trip, error) {
+	result := db.trips.FindOne(context.TODO(), bson.D{})
+
+	var trip Trip
+	err := result.Decode(&trip)
+	if err != nil {
+		return nil, err
+	}
+
+	return &trip, nil
 }
 
 func (db *db) GetTrip(tripId string) (*Trip, error) {

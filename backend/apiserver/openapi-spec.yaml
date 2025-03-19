@@ -4,7 +4,7 @@ info:
   description: trippify API
   version: 1.0.0
 servers:
-  - url: "http://localhost:3000"
+  - url: "http://192.168.178.32:3000"
     description: "Local development server"
 
 paths:
@@ -46,6 +46,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+
+  /api/firstTrip:
+    get:
+      operationId: firstTrip.get
+      summary: Get the firstTrip
+      responses:
+        200:
+          description: The first trip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        404:
+          $ref: "#/components/responses/ErrorResponse"
 
   /api/trip/{tripId}:
     get:

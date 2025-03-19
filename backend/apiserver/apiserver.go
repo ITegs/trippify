@@ -77,6 +77,11 @@ func (api *apiServer) buildApi() *httprouter.Router {
 		},
 		{
 			Method:  http.MethodGet,
+			Path:    "/firstTrip",
+			Handler: http.HandlerFunc(api.GetFirstTrip),
+		},
+		{
+			Method:  http.MethodGet,
 			Path:    "/trip/:tripId",
 			Handler: http.HandlerFunc(api.GetTrip),
 		},
@@ -150,6 +155,36 @@ func (api *apiServer) NewUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	// TODO: Return the user
 	json.NewEncoder(w).Encode(fullUser)
+	return
+}
+
+func (api *apiServer) GetFirstTrip(w http.ResponseWriter, r *http.Request) {
+	trip, err := api.db.GetFirstTrip()
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		return
+	}
+
+	owner, err := api.db.GetUserByUsername(trip.Username)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		return
+	}
+
+	trip.Owner = owner
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	encoder := json.NewEncoder(w)
+
+	err = encoder.Encode(trip)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	return
 }
 
