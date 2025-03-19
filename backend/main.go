@@ -5,14 +5,13 @@ import (
 	"github.com/ITegs/trippify/apiserver"
 	"github.com/ITegs/trippify/database"
 	"github.com/joho/godotenv"
-	"log"
 	"os"
 )
 
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		fmt.Println("Error loading .env file")
 	}
 
 	fmt.Println("Welcome to trippify!")
