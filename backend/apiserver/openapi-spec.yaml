@@ -4,8 +4,10 @@ info:
   description: trippify API
   version: 1.0.0
 servers:
-  - url: "http://192.168.178.32:3000"
-    description: "Local development server"
+#  - url: "http://192.168.178.32:3000"
+#    description: "Local development server"
+  - url: "https://trip.jople.dev"
+    description: "Public development server"
 
 paths:
   /api/user/{username}:

@@ -55,7 +55,6 @@ func init() {
 	fmt.Println("Initializing the DB")
 
 	dbUri := os.Getenv("DATABASE_URI")
-	fmt.Println("DB-Uri: " + dbUri)
 
 	clientOptions := options.Client().ApplyURI(dbUri)
 	mongoClient, err := mongo.Connect(context.TODO(), clientOptions)
