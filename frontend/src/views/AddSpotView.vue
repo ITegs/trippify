@@ -93,9 +93,9 @@ onMounted(() =>
 
 
 function getLocation() {
-  if (navigator.geolocation) {
+  if (window.navigator.geolocation) {
     console.log("Getting location...")
-    navigator.geolocation.getCurrentPosition(
+    window.navigator.geolocation.getCurrentPosition(
         (position: GeolocationPosition) => {
           const lat = Math.round(position.coords.latitude * POSITIONING_ACCURACY) / POSITIONING_ACCURACY
           const lon = Math.round(position.coords.longitude * POSITIONING_ACCURACY) / POSITIONING_ACCURACY
@@ -105,6 +105,7 @@ function getLocation() {
         }
     )
   } else {
+    alert("Geolocation is not supported")
     console.log("Geolocation is not supported");
   }
 }
@@ -144,7 +145,7 @@ function removeImage($event: Event) { // TODO: fix
 
 function submit() {
   if (spot.value.title.length > 0 && spot.value.latitude != 0 && spot.value.longitude != 0 && spot.value.images.length > 0) {
-    tripStore.addSpotToTrip("66dde729394be9748a284296", spot.value).then(
+    tripStore.addSpotToTrip(tripStore.trip._id, spot.value).then(
         () => window.location.href = "/"
     )
   } else {
@@ -159,21 +160,22 @@ function submit() {
 
 <style scoped lang="scss">
 main {
-  // Noscroll
-  //position: fixed;
-  //overflow: hidden;
   width: 100%;
-
-  margin-top: 4rem;
   padding-inline: 1rem;
 
   .head {
+    background-color: var(--color-background);
+    width: 100%;
+    padding-top: 4rem;
+    padding-bottom: 1rem;
+
     display: grid;
     grid-template-columns: 100px 1fr 100px;
     align-items: center;
     justify-items: center;
 
     position: fixed;
+    z-index: 2;
 
     .back {
       display: flex;
@@ -191,7 +193,7 @@ main {
   }
 
   .location {
-    margin-top: 1rem;
+    margin-top: 5rem;
 
     position: relative;
     top: 1rem;
