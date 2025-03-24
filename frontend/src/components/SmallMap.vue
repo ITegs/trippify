@@ -9,7 +9,7 @@ import { onMounted, watch } from 'vue'
 
 const {
   position,
-  zoom = 13,
+  zoom = 16,
   marker,
   draggable = true
 } = defineProps<{

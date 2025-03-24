@@ -105,15 +105,6 @@ function goBack() {
 
 onMounted(() => getLocation())
 
-navigator.geolocation.getCurrentPosition(
-  function (position) {
-    alert('yay!')
-  },
-  function (error) {
-    alert('boo! error: ' + error.message)
-  }
-)
-
 function getLocation() {
   if (window.navigator.geolocation) {
     console.log('Getting location...')
