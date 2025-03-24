@@ -1,5 +1,5 @@
-import {defineStore} from "pinia";
-import {DefaultApi, type User} from "trippify-client/api";
+import { defineStore } from 'pinia'
+import { DefaultApi, type User } from 'trippify-client/api'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -21,7 +21,7 @@ export const useUserStore = defineStore('user', {
     async setUser(username: string, password: string) {
       const api = new DefaultApi()
       const user = (await api.userGet(username)).data
-      this.$patch({user})
+      this.$patch({ user })
     }
-  },
+  }
 })

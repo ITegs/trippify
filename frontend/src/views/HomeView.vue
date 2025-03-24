@@ -1,10 +1,16 @@
 <template>
   <div class="noscroll">
-    <Map id="homeMap" :marker="marker" @changedSpot="changeSpot"/>
-    <Modal id="modal" :pretitle="`${spot.latitude} // ${spot.longitude}`" :title="spot.title" :dateFrom="dateFrom"
-           :dateTo="dateTo" :num-pics="spot.images?.length">
+    <Map id="homeMap" :marker="marker" @changedSpot="changeSpot" />
+    <Modal
+      id="modal"
+      :pretitle="`${spot.latitude} // ${spot.longitude}`"
+      :title="spot.title"
+      :dateFrom="dateFrom"
+      :dateTo="dateTo"
+      :num-pics="spot.images?.length"
+    >
       <template #content>
-        <TripCarousel :spot="spot"/>
+        <TripCarousel :spot="spot" />
         <p>{{ spot.description }}</p>
       </template>
     </Modal>
@@ -12,26 +18,26 @@
 </template>
 
 <script setup lang="ts">
-import {onBeforeMount, ref, type Ref, watch} from 'vue'
+import { onBeforeMount, ref, type Ref, watch } from 'vue'
 
 import Map from '@/components/Map.vue'
 import Modal from '@/components/Modal.vue'
 import TripCarousel from '@/components/TripCarousel.vue'
-import {useTripStore} from '@/stores/trip'
-import type {Spot} from "trippify-client/api";
-import {type LatLngTuple} from "leaflet";
-import {useRoute} from 'vue-router'
+import { useTripStore } from '@/stores/trip'
+import type { Spot } from 'trippify-client/api'
+import { type LatLngTuple } from 'leaflet'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
 const tripStore = useTripStore()
 
-const spot: Ref<Spot> = ref({} as Spot);
+const spot: Ref<Spot> = ref({} as Spot)
 const dateFrom: Ref<Date> = ref(new Date())
 const dateTo: Ref<Date | null> = ref(null)
 
 type Marker = {
-  spotId: string,
+  spotId: string
   latLng: LatLngTuple
 }
 
@@ -39,7 +45,7 @@ const marker: Ref<Marker[]> = ref([] as Marker[])
 
 onBeforeMount(async () => {
   if (route.params.tripId) {
-    await tripStore.setTrip(route.params.tripId as string);
+    await tripStore.setTrip(route.params.tripId as string)
   }
 })
 
@@ -49,14 +55,14 @@ watch(tripStore.trip, async () => {
     spot.value = await tripStore.fetchSpot(firstSpot.spotId)
   }
 
-  dateFrom.value = new Date(spot.value.date_from);
+  dateFrom.value = new Date(spot.value.date_from)
   if (spot.value.date_to) {
     dateTo.value = new Date(spot.value.date_to!)
   }
 
   if (tripStore.trip.spots) {
-    marker.value = tripStore.trip.spots.map(spot => {
-      return {spotId: spot.spotId, latLng: [spot.latitude, spot.longitude]}
+    marker.value = tripStore.trip.spots.map((spot) => {
+      return { spotId: spot.spotId, latLng: [spot.latitude, spot.longitude] }
     })
   }
 })
@@ -64,7 +70,7 @@ watch(tripStore.trip, async () => {
 async function changeSpot(spotId: string) {
   spot.value = await tripStore.fetchSpot(spotId)
 
-  dateFrom.value = new Date(spot.value.date_from);
+  dateFrom.value = new Date(spot.value.date_from)
   if (spot.value.date_to) {
     dateTo.value = new Date(spot.value.date_to!)
   }
@@ -76,7 +82,6 @@ async function changeSpot(spotId: string) {
   position: fixed;
   overflow: hidden;
 }
-
 
 #homeMap {
   height: 100dvh;

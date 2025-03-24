@@ -57,26 +57,24 @@ body {
   min-height: 90dvh;
   color: var(--color-text);
   background: var(--color-background);
-  transition: color 0.5s,
-  background-color 0.5s;
-  font-family: Lato,
-  -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  Roboto,
-  Oxygen,
-  Ubuntu,
-  Cantarell,
-  'Fira Sans',
-  'Droid Sans',
-  'Helvetica Neue',
-  sans-serif;
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  font-family:
+    Lato,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
   font-size: 15px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  // Prevent elastic scroll // TODO
-  //overflow: hidden;
-  //height: 100%;
 }

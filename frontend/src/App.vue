@@ -1,18 +1,17 @@
 <template>
-  <Header :trip="trip" id="header"/>
-  <RouterView/>
+  <Header :trip="trip" id="header" />
+  <RouterView />
 </template>
 
 <script setup lang="ts">
-import {useTripStore} from "@/stores/trip";
-import Header from "@/components/Header.vue";
-import {storeToRefs} from "pinia";
+import { useTripStore } from '@/stores/trip'
+import Header from '@/components/Header.vue'
+import { storeToRefs } from 'pinia'
 
-const tripStore = useTripStore();
-tripStore.init();
-const {trip} = storeToRefs(tripStore);
+const tripStore = useTripStore()
+tripStore.init()
+const { trip } = storeToRefs(tripStore)
 </script>
-
 
 <style scoped lang="scss">
 #header {

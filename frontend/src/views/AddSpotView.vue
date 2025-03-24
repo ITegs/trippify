@@ -44,7 +44,7 @@
       type="file"
       accept="image/*"
       multiple
-      @change="onFileChanged($event)"
+      @change="onFileChanged"
       ref="imageUpload"
       v-show="false"
     />
@@ -105,6 +105,15 @@ function goBack() {
 
 onMounted(() => getLocation())
 
+navigator.geolocation.getCurrentPosition(
+  function (position) {
+    alert('yay!')
+  },
+  function (error) {
+    alert('boo! error: ' + error.message)
+  }
+)
+
 function getLocation() {
   if (window.navigator.geolocation) {
     console.log('Getting location...')
@@ -122,9 +131,9 @@ function getLocation() {
   }
 }
 
-async function onFileChanged($event: Event) {
+async function onFileChanged(event: Event) {
   console.log('File uploaded')
-  const target = $event.target as HTMLInputElement
+  const target = event.target as HTMLInputElement
   if (target && target.files) {
     for (let file of target.files) {
       const compressedImage = await compressImage(file, COMPRESSION_FACTOR)

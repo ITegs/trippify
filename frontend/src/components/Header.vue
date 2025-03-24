@@ -8,18 +8,17 @@
       <b>{{ trip.title }}</b>
     </div>
     <div v-if="trip?.owner" class="profilePic">
-      <img :src="trip.owner.profile_pic" alt="Profile picture"/>
+      <img :src="trip.owner.profile_pic" alt="Profile picture" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type {Trip} from 'trippify-client/api'
+import type { Trip } from 'trippify-client/api'
 
 const props = defineProps<{
   trip?: Trip
 }>()
-
 </script>
 
 <style scoped lang="scss">
@@ -85,5 +84,4 @@ const props = defineProps<{
     }
   }
 }
-
 </style>

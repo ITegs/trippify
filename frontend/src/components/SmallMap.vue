@@ -1,15 +1,20 @@
 <template>
-  <div id="map"/>
+  <div id="map" />
 </template>
 
 <script setup lang="ts">
 import * as L from 'leaflet'
-import {type LatLngTuple} from 'leaflet'
-import {onMounted, watch} from "vue";
+import { type LatLngTuple } from 'leaflet'
+import { onMounted, watch } from 'vue'
 
-const {position, zoom = 13, marker, draggable = true} = defineProps<{
+const {
+  position,
+  zoom = 13,
+  marker,
+  draggable = true
+} = defineProps<{
   position: LatLngTuple
-  zoom?: number;
+  zoom?: number
   marker?: LatLngTuple[]
   draggable?: boolean
 }>()
@@ -23,7 +28,7 @@ onMounted(() => {
     attribution: import.meta.env.VITE_MAP_ATTRIBUTION
   }).addTo(map)
 
-  if(!draggable) {
+  if (!draggable) {
     map.dragging.disable()
   }
 
@@ -49,13 +54,16 @@ function drawMarker(mark: LatLngTuple[]) {
   })
 }
 
-
 // Watch the position prop to update map position
-watch(() => position, (newPosition) => {
-  if (map) {
-    map.flyTo(newPosition) // Fly to the new position when it changes
-  }
-}, { immediate: true }) // Ensure it runs immediately on mount as well
+watch(
+  () => position,
+  (newPosition) => {
+    if (map) {
+      map.flyTo(newPosition) // Fly to the new position when it changes
+    }
+  },
+  { immediate: true }
+) // Ensure it runs immediately on mount as well
 </script>
 
 <style scoped lang="scss">

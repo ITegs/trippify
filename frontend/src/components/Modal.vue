@@ -1,21 +1,23 @@
 <template>
   <div
-      id="modal"
-      :style="heightMode === 'absolute' ? {top: absYPos + 'px'} : {top: relYPos+ 'dvh'}"
-      :class="{
+    id="modal"
+    :style="heightMode === 'absolute' ? { top: absYPos + 'px' } : { top: relYPos + 'dvh' }"
+    :class="{
       closed: modalState === ModalState.closed,
       half: modalState === ModalState.half,
       full: modalState === ModalState.full,
       animate: heightMode === 'relative'
     }"
   >
-    <div id="head"
-         v-drag="dragHandler"
-         :style="{
+    <div
+      id="head"
+      :style="{
         boxShadow: modalState !== ModalState.closed ? '0 0 10px 0 rgba(0, 0, 0, 0.1)' : 'none'
       }"
     >
-      <span class="pull-line"/>
+      <div id="drag-section" v-drag="dragHandler">
+        <span class="pull-line" />
+      </div>
 
       <div class="title">
         <p>{{ pretitle }}</p>
@@ -43,33 +45,37 @@
 
       <h2 id="isCurrent" v-if="!dateTo">Aktueller Ort</h2>
 
-      <div class="numPics" :class="modalState !== ModalState.closed ? 'hidden' : ''" v-show="numPics">
+      <div
+        class="numPics"
+        :class="modalState !== ModalState.closed ? 'hidden' : ''"
+        v-show="numPics"
+      >
         <p v-if="numPics !== 1">{{ numPics }} Fotos</p>
         <p v-else>{{ numPics }} Foto</p>
-        <font-awesome-icon :icon="['fas', 'chevron-down']"/>
+        <font-awesome-icon :icon="['fas', 'chevron-down']" />
       </div>
     </div>
 
     <div
-        class="content"
-        :style="{
+      class="content"
+      :style="{
         paddingTop: !modalState ? '10vh' : '0',
         opacity: modalState ? '1' : '0',
         height: windowHeight * FULL_MODAL_PERCENT_HEIGHT - 100 + 'px'
       }"
     >
-      <slot name="content"/>
+      <slot name="content" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {onUpdated, ref, type Ref} from 'vue'
-import {useDrag} from '@vueuse/gesture'
+import { onUpdated, ref, type Ref } from 'vue'
+import { useDrag } from '@vueuse/gesture'
 
-const CLOSED_MODAL_PERCENT_HEIGHT = 0.20
+const CLOSED_MODAL_PERCENT_HEIGHT = 0.2
 const HALF_MODAL_PERCENT_HEIGHT = 0.55
-const FULL_MODAL_PERCENT_HEIGHT = 0.90
+const FULL_MODAL_PERCENT_HEIGHT = 0.9
 
 const props = defineProps<{
   pretitle: String
@@ -83,13 +89,16 @@ const today = new Date()
 const duration = ref(0)
 
 onUpdated(() => {
-      if (props.dateTo) {
-        duration.value = Math.floor((props.dateTo.getTime() - props.dateFrom.getTime()) / (1000 * 60 * 60 * 24))
-      } else {
-        duration.value = Math.floor((today.getTime() - props.dateFrom.getTime()) / (1000 * 60 * 60 * 24))
-      }
-    }
-)
+  if (props.dateTo) {
+    duration.value = Math.floor(
+      (props.dateTo.getTime() - props.dateFrom.getTime()) / (1000 * 60 * 60 * 24)
+    )
+  } else {
+    duration.value = Math.floor(
+      (today.getTime() - props.dateFrom.getTime()) / (1000 * 60 * 60 * 24)
+    )
+  }
+})
 
 enum ModalState {
   'closed',
@@ -98,21 +107,21 @@ enum ModalState {
 }
 
 const windowHeight = window.screen.height
-const heightMode = ref<"absolute" | "relative">("relative")
+const heightMode = ref<'absolute' | 'relative'>('relative')
 const relYPos = ref(100 - CLOSED_MODAL_PERCENT_HEIGHT * 100)
 const absYPos = ref(windowHeight * (1 - CLOSED_MODAL_PERCENT_HEIGHT))
 let lastY = absYPos.value
 
 const modalState: Ref<ModalState> = ref(ModalState.closed)
 
-const dragHandler = ({movement: [, y], dragging}: any) => {
+const dragHandler = ({ movement: [, y], dragging }: any) => {
   if (dragging) {
-    heightMode.value = "absolute"
+    heightMode.value = 'absolute'
     if (absYPos.value + y > 40 && absYPos.value + y < windowHeight - 60) {
       absYPos.value = y + lastY
     }
   } else {
-    heightMode.value = "relative"
+    heightMode.value = 'relative'
     lastY = absYPos.value
 
     switch (modalState.value) {
@@ -199,12 +208,24 @@ useDrag(dragHandler, {
       //padding-bottom: 0.5rem;
 
       p {
-        display: none
+        display: none;
       }
 
       .dateLabel {
         display: none;
       }
+    }
+  }
+}
+
+.full {
+  .content {
+    :deep(img) {
+      height: 100% !important;
+    }
+
+    :deep(.swiper-wrapper) {
+      height: 100% !important;
     }
   }
 }
@@ -220,19 +241,22 @@ useDrag(dragHandler, {
   }
 
   #head {
-    width: 100%;
-    // height: 16vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 1rem;
     padding-bottom: 1rem;
 
-    .pull-line {
-      height: 4px;
-      width: 60px;
-      border-radius: 5px;
-      background-color: #dbdbdb;
+    #drag-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 1rem;
+      padding-bottom: 0.5rem;
+
+      .pull-line {
+        height: 4px;
+        width: 60px;
+        border-radius: 5px;
+        background-color: #dbdbdb;
+      }
     }
 
     .title {
@@ -242,7 +266,6 @@ useDrag(dragHandler, {
       grid-template-rows: 1fr 1fr;
       grid-auto-flow: column;
       align-items: end;
-      padding-top: 0.5rem;
       padding-inline: 1rem;
 
       p {
