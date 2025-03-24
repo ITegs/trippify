@@ -187,7 +187,7 @@ components:
         - owner #TODO: Get the user from the auth
         - title
       properties:
-        username:
+        owner_username:
           $ref: "#/components/schemas/Username"
         title:
           type: string

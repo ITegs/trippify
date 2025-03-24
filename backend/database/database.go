@@ -19,12 +19,12 @@ type User struct {
 }
 
 type Trip struct {
-	Owner     *User      `json:"owner,omitempty" bson:"owner"`
-	Username  string     `json:"username,omitempty" bson:"username"`
-	Title     string     `json:"title,omitempty" bson:"title"`
-	StartDate string     `json:"start_date" bson:"start_date"`
-	EndDate   string     `json:"end_date" bson:"end_date"`
-	Spots     []TripSpot `json:"spots" bson:"spots"`
+	Owner         *User      `json:"owner,omitempty" bson:"owner"`
+	OwnerUsername string     `json:"owner_username,omitempty" bson:"owner_username"`
+	Title         string     `json:"title,omitempty" bson:"title"`
+	StartDate     string     `json:"start_date" bson:"start_date"`
+	EndDate       string     `json:"end_date" bson:"end_date"`
+	Spots         []TripSpot `json:"spots" bson:"spots"`
 }
 
 type TripSpot struct {
@@ -186,18 +186,17 @@ func (db *db) NewTrip(trip *Trip) error {
 	}
 	fmt.Println("Inserted a new trip: ", tripResult.InsertedID)
 
-	filter := bson.D{{Key: "_id", Value: trip.Owner}}
+	filter := bson.D{{Key: "username", Value: trip.OwnerUsername}}
 	update := bson.D{
 		{Key: "$push", Value: bson.D{
 			{Key: "trips", Value: tripResult.InsertedID},
 		}},
 	}
 
-	userResult, err := db.users.UpdateOne(context.TODO(), filter, update)
+	_, err = db.users.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		return err
 	}
-	fmt.Println("Added the trip to the user: ", userResult.UpsertedID)
 
 	return nil
 }

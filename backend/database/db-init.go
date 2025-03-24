@@ -73,12 +73,12 @@ func initializeDB(db *mongo.Database) {
 	tripJsonSchema := bson.M{
 		"bsonType": "object",
 		"title":    "trip",
-		"required": []string{"_id", "username", "title", "start_date"},
+		"required": []string{"_id", "owner_username", "title", "start_date"},
 		"properties": bson.M{
 			"_id": bson.M{
 				"bsonType": "objectId",
 			},
-			"username": bson.M{
+			"owner_username": bson.M{
 				"bsonType": "string",
 				"pattern":  "^[a-z0-9.]+$",
 			},

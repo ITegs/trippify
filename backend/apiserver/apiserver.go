@@ -166,7 +166,7 @@ func (api *apiServer) GetFirstTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	owner, err := api.db.GetUserByUsername(trip.Username)
+	owner, err := api.db.GetUserByUsername(trip.OwnerUsername)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -199,7 +199,7 @@ func (api *apiServer) GetTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	owner, err := api.db.GetUserByUsername(trip.Username)
+	owner, err := api.db.GetUserByUsername(trip.OwnerUsername)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -225,7 +225,8 @@ func (api *apiServer) GetTrip(w http.ResponseWriter, r *http.Request) {
 func (api *apiServer) NewTrip(w http.ResponseWriter, r *http.Request) {
 	var trip database.Trip
 	err := json.NewDecoder(r.Body).Decode(&trip)
-	if err != nil || trip.Title == "" || trip.Owner.Username == "" {
+
+	if err != nil || trip.Title == "" || trip.OwnerUsername == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println(err)
 		return
