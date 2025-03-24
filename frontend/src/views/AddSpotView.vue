@@ -76,7 +76,9 @@ import Compressor from 'compressorjs'
  */
 const POSITIONING_ACCURACY = 1000 // -> 11.1m
 
-const COMPRESSION_FACTOR = 0.2
+const COMPRESSION_QUALITY = 0.5
+const COMPRESSION_MAX_WIDTH = 1500
+const COMPRESSION_MAX_HEIGHT = 1500
 
 const tripStore = useTripStore()
 
@@ -127,7 +129,13 @@ async function onFileChanged(event: Event) {
   const target = event.target as HTMLInputElement
   if (target && target.files) {
     for (let file of target.files) {
-      const compressedImage = await compressImage(file, COMPRESSION_FACTOR)
+      const compressedImage = await compressImage(
+        file,
+        COMPRESSION_QUALITY,
+        COMPRESSION_MAX_WIDTH,
+        COMPRESSION_MAX_HEIGHT
+      )
+
       const reader = new FileReader()
       reader.readAsDataURL(compressedImage)
       reader.onloadend = () => {
@@ -142,10 +150,17 @@ async function onFileChanged(event: Event) {
   }
 }
 
-async function compressImage(image: File, quality: number): Promise<File | Blob> {
+async function compressImage(
+  image: File,
+  quality: number,
+  maxWidth: number,
+  maxHeight: number
+): Promise<File | Blob> {
   return await new Promise((resolve, reject) => {
     new Compressor(image, {
       quality,
+      maxWidth,
+      maxHeight,
       success: resolve,
       error: reject
     })
