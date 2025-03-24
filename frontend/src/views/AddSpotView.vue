@@ -52,6 +52,7 @@ import type {NewSpot} from "trippify-client";
 import {useTripStore} from "@/stores/trip";
 import router from "@/router";
 import SmallMap from "@/components/SmallMap.vue";
+import Compressor from 'compressorjs';
 
 /* Lat/Lon accuracy by decimal places:
 * 3 decimal places: ~111 meters
@@ -59,6 +60,8 @@ import SmallMap from "@/components/SmallMap.vue";
 * 5 decimal places: ~1.11 meters
 */
 const POSITIONING_ACCURACY = 1000 // -> 11.1m
+
+const COMPRESSION_FACTOR = 0.2
 
 const tripStore = useTripStore()
 
@@ -109,13 +112,14 @@ function getLocation() {
   }
 }
 
-function onFileChanged($event: Event) {
+async function onFileChanged($event: Event) {
   console.log("File uploaded")
   const target = $event.target as HTMLInputElement;
   if (target && target.files) {
     for (let file of target.files) {
+      const compressedImage = await compressImage(file, COMPRESSION_FACTOR)
       const reader = new FileReader();
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(compressedImage);
       reader.onloadend = () => {
         if (reader.readyState === 2 && reader.result) {
           spot.value.images.push({
@@ -127,6 +131,18 @@ function onFileChanged($event: Event) {
     }
   }
 }
+
+async function compressImage(image: File, quality: number): Promise<File | Blob> {
+  return await new Promise((resolve, reject) => {
+    new Compressor(image, {
+      quality,
+      success: resolve,
+      error: reject,
+    });
+  });
+
+}
+
 
 function get32BitTimestamp() {
   const milliseconds = Date.now();

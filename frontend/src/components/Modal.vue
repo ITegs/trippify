@@ -46,7 +46,7 @@
       <div class="numPics" :class="modalState !== ModalState.closed ? 'hidden' : ''" v-show="numPics">
         <p v-if="numPics !== 1">{{ numPics }} Fotos</p>
         <p v-else>{{ numPics }} Foto</p>
-        <font-awesome-icon :icon="['fas', 'chevron-down']" />
+        <font-awesome-icon :icon="['fas', 'chevron-down']"/>
       </div>
     </div>
 
@@ -54,7 +54,8 @@
         class="content"
         :style="{
         paddingTop: !modalState ? '10vh' : '0',
-        opacity: modalState ? '1' : '0'
+        opacity: modalState ? '1' : '0',
+        height: windowHeight * FULL_MODAL_PERCENT_HEIGHT - 100 + 'px'
       }"
     >
       <slot name="content"/>
@@ -299,7 +300,6 @@ useDrag(dragHandler, {
   }
 
   .content {
-    //height: 63dvh;
     padding-block: 2rem;
     overflow-y: auto;
     transition: all 0.5s ease-in-out;

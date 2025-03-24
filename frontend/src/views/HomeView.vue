@@ -96,7 +96,8 @@ async function changeSpot(spotId: string) {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 
   p {
-    //text-align: justify;
+    //text-align: justify;"
+    font-family: Arvo;
     font-size: 1rem;
     margin: 1rem;
   }

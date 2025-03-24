@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import * as L from 'leaflet'
 import {type LatLngTuple} from 'leaflet'
-import {onMounted} from "vue";
+import {onMounted, watch} from "vue";
 
 const {position, zoom = 13, marker, draggable = true} = defineProps<{
   position: LatLngTuple
@@ -51,11 +51,11 @@ function drawMarker(mark: LatLngTuple[]) {
 
 
 // Watch the position prop to update map position
-// watch(() => position, (newPosition) => {
-//   if (map) {
-//     map.flyTo(newPosition) // Fly to the new position when it changes
-//   }
-// }, { immediate: true }) // Ensure it runs immediately on mount as well
+watch(() => position, (newPosition) => {
+  if (map) {
+    map.flyTo(newPosition) // Fly to the new position when it changes
+  }
+}, { immediate: true }) // Ensure it runs immediately on mount as well
 </script>
 
 <style scoped lang="scss">
