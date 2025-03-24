@@ -46,6 +46,10 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}-frontend
           labels: ${{ steps.meta.outputs.labels }}-frontend
+          build-args: |
+            TILE_URL=${{ secrets.TILE_URL }}
+            TILE_KEY=${{ secrets.TILE_KEY }}
+            MAP_ATTRIBUTION=${{ secrets.MAP_ATTRIBUTION }}
           cache-from: type=gha
           cache-to: type=gha
 
