@@ -19,12 +19,13 @@ type User struct {
 }
 
 type Trip struct {
-	Owner         *User      `json:"owner,omitempty" bson:"owner"`
-	OwnerUsername string     `json:"owner_username,omitempty" bson:"owner_username"`
-	Title         string     `json:"title,omitempty" bson:"title"`
-	StartDate     string     `json:"start_date" bson:"start_date"`
-	EndDate       string     `json:"end_date" bson:"end_date"`
-	Spots         []TripSpot `json:"spots" bson:"spots"`
+	ID            primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	Owner         *User              `json:"owner,omitempty" bson:"owner"`
+	OwnerUsername string             `json:"owner_username,omitempty" bson:"owner_username"`
+	Title         string             `json:"title,omitempty" bson:"title"`
+	StartDate     string             `json:"start_date" bson:"start_date"`
+	EndDate       string             `json:"end_date" bson:"end_date"`
+	Spots         []TripSpot         `json:"spots" bson:"spots"`
 }
 
 type TripSpot struct {

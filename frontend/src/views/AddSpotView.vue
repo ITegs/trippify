@@ -62,7 +62,6 @@ const POSITIONING_ACCURACY = 1000 // -> 11.1m
 
 const tripStore = useTripStore()
 
-
 const spot = ref<NewSpot>({
   title: "",
   latitude: 0,
@@ -144,8 +143,10 @@ function removeImage($event: Event) { // TODO: fix
 }
 
 function submit() {
+  const tripId = tripStore.trip._id
+
   if (spot.value.title.length > 0 && spot.value.latitude != 0 && spot.value.longitude != 0 && spot.value.images.length > 0) {
-    tripStore.addSpotToTrip(tripStore.trip._id, spot.value).then(
+    tripStore.addSpotToTrip(tripId, spot.value).then(
         () => window.location.href = "/"
     )
   } else {

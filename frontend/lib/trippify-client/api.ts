@@ -130,7 +130,7 @@ export interface NewTrip {
      * @type {string}
      * @memberof NewTrip
      */
-    'username'?: string;
+    'owner_username'?: string;
     /**
      * 
      * @type {string}
@@ -259,7 +259,7 @@ export interface Trip {
      * @type {string}
      * @memberof Trip
      */
-    'username'?: string;
+    'owner_username'?: string;
     /**
      * 
      * @type {string}
