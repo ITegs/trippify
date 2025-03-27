@@ -11,5 +11,8 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  preview: {
+    allowedHosts: ['trip.jople.dev']
   }
 })
