@@ -2,6 +2,15 @@ import { defineStore } from 'pinia'
 import { DefaultApi, type Spot, type Trip } from 'trippify-client/api'
 import type { NewSpot } from 'trippify-client'
 
+const accessToken = localStorage.getItem('JWT') || ''
+const apiConfig = {
+  isJsonMime(): boolean {
+    return false
+  },
+  accessToken
+}
+const api = new DefaultApi(apiConfig)
+
 export const useTripStore = defineStore('trip', {
   state: () => ({
     trip: {} as Trip,
@@ -21,7 +30,6 @@ export const useTripStore = defineStore('trip', {
     },
 
     async setToFirstTrip() {
-      const api = new DefaultApi()
       try {
         const trip: Trip = (await api.firstTripGet()).data
         this.$patch({ trip })
@@ -32,7 +40,6 @@ export const useTripStore = defineStore('trip', {
     },
 
     async setTrip(tripId: string) {
-      const api = new DefaultApi()
       try {
         const trip: Trip = (await api.tripGet(tripId)).data
         this.$patch({ trip })
@@ -43,7 +50,6 @@ export const useTripStore = defineStore('trip', {
     },
 
     async addSpotToTrip(tripId: string, spot: NewSpot) {
-      const api = new DefaultApi()
       try {
         const newSpot = (await api.addSpotToTripPost(tripId, spot)).data
         this.spots.push(newSpot)
@@ -60,7 +66,6 @@ export const useTripStore = defineStore('trip', {
         return existingSpot
       }
 
-      const api = new DefaultApi()
       try {
         const spot: Spot = (await api.spotGet(spotId)).data
         this.$patch((state) => {

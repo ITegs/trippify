@@ -1,15 +1,15 @@
 <template>
   <div class="header">
-    <h1>trippify</h1>
+    <a href="/" class="logo">trippify</a>
     <div v-if="trip?.owner" class="tripInfo">
       <p>
         <u>{{ trip.owner.name }}</u> ist unterwegs:
       </p>
       <b>{{ trip.title }}</b>
     </div>
-    <div v-if="trip?.owner" class="profilePic">
-      <img :src="trip.owner.profile_pic" alt="Profile picture" />
-    </div>
+    <a href="/account" class="profilePic">
+      <img :src="trip.owner.profile_pic" v-if="trip?.owner" alt="Profile picture" />
+    </a>
   </div>
 </template>
 
@@ -31,7 +31,7 @@ const props = defineProps<{
   position: relative;
   z-index: 900;
 
-  h1 {
+  .logo {
     display: flex;
     align-items: center;
     margin-left: 1rem;
@@ -40,6 +40,8 @@ const props = defineProps<{
     color: var(--color-primary);
     font-weight: 900;
     font-size: 1.2rem;
+
+    text-decoration: none;
   }
 
   .tripInfo {

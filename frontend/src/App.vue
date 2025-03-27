@@ -7,6 +7,10 @@
 import { useTripStore } from '@/stores/trip'
 import Header from '@/components/Header.vue'
 import { storeToRefs } from 'pinia'
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
+userStore.getUserFromLocalStorage()
 
 const tripStore = useTripStore()
 tripStore.init()
