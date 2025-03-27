@@ -13,6 +13,7 @@ import (
 
 type User struct {
 	Username   string               `json:"username,omitempty" bson:"username"`
+	Password   string               `json:"password,omitempty" bson:"password"`
 	Name       string               `json:"name,omitempty" bson:"name"`
 	ProfilePic string               `json:"profile_pic" bson:"profile_pic"`
 	Trips      []primitive.ObjectID `json:"trips" bson:"trips"`

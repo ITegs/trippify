@@ -17,7 +17,7 @@ func initializeDB(db *mongo.Database) {
 	userJsonSchema := bson.M{
 		"bsonType": "object",
 		"title":    "user",
-		"required": []string{"_id", "username", "name"},
+		"required": []string{"_id", "username", "password", "name"},
 		"properties": bson.M{
 			"_id": bson.M{
 				"bsonType": "objectId",
@@ -25,6 +25,9 @@ func initializeDB(db *mongo.Database) {
 			"username": bson.M{
 				"bsonType": "string",
 				"pattern":  "^[a-z0-9.]+$",
+			},
+			"password": bson.M{
+				"bsonType": "string",
 			},
 			"name": bson.M{
 				"bsonType": "string",
