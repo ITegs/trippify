@@ -13,18 +13,13 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
 import { useTripStore } from '@/stores/trip'
-import router from '@/router'
 
 function goToAddSpot() {
-  // router.push({ path: '/addSpot' })
-  // router.go(1)
   window.location.href = '/addSpot'
 }
 
 const userStore = useUserStore()
 const tripStore = useTripStore()
-
-userStore.setUser('joe', '')
 </script>
 
 <style scoped lang="scss">

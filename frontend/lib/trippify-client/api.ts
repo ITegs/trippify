@@ -58,6 +58,25 @@ export interface Image {
 /**
  * 
  * @export
+ * @interface LoginUser
+ */
+export interface LoginUser {
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginUser
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginUser
+     */
+    'password': string;
+}
+/**
+ * 
+ * @export
  * @interface ModelError
  */
 export interface ModelError {
@@ -149,19 +168,25 @@ export interface NewUser {
      * @type {string}
      * @memberof NewUser
      */
-    'username': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NewUser
-     */
-    'name': string;
+    'name'?: string;
     /**
      * 
      * @type {string}
      * @memberof NewUser
      */
     'profile_pic'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NewUser
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NewUser
+     */
+    'password': string;
 }
 /**
  * 
@@ -306,28 +331,28 @@ export interface User {
     '_id': string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {string}
      * @memberof User
      */
-    'trips'?: Array<string>;
+    'username'?: string;
     /**
      * 
      * @type {string}
      * @memberof User
      */
-    'username': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof User
-     */
-    'name': string;
+    'name'?: string;
     /**
      * 
      * @type {string}
      * @memberof User
      */
     'profile_pic'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof User
+     */
+    'trips'?: Array<string>;
 }
 
 /**
@@ -408,6 +433,42 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Login
+         * @param {LoginUser} loginUser 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        loginPost: async (loginUser: LoginUser, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'loginUser' is not null or undefined
+            assertParamExists('loginPost', 'loginUser', loginUser)
+            const localVarPath = `/api/login`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(loginUser, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Create a new trip
          * @param {NewTrip} newTrip 
          * @param {*} [options] Override http request option.
@@ -427,6 +488,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
     
@@ -618,6 +683,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Login
+         * @param {LoginUser} loginUser 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async loginPost(loginUser: LoginUser, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.loginPost(loginUser, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.loginPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Create a new trip
          * @param {NewTrip} newTrip 
          * @param {*} [options] Override http request option.
@@ -713,6 +791,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary Login
+         * @param {LoginUser} loginUser 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        loginPost(loginUser: LoginUser, options?: RawAxiosRequestConfig): AxiosPromise<string> {
+            return localVarFp.loginPost(loginUser, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Create a new trip
          * @param {NewTrip} newTrip 
          * @param {*} [options] Override http request option.
@@ -793,6 +881,18 @@ export class DefaultApi extends BaseAPI {
      */
     public firstTripGet(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).firstTripGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Login
+     * @param {LoginUser} loginUser 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public loginPost(loginUser: LoginUser, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).loginPost(loginUser, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import AddSpotView from '@/views/AddSpotView.vue'
+import AccountView from "@/views/AccountView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,11 @@ const router = createRouter({
       path: '/trip/:tripId',
       name: 'trip',
       component: HomeView
+    },
+    {
+      path: '/account',
+      name: 'account',
+      component: AccountView
     }
   ]
 })
