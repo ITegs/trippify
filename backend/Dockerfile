@@ -1,7 +1,7 @@
 # +-----------------------------------------------------------------------------
 # | Pull vendor dependencies
 # +-----------------------------------------------------------------------------
-FROM golang:1.22.2-alpine3.18 AS vendor
+FROM golang:1.23.7-alpine3.21 AS vendor
 
 RUN mkdir /app && mkdir /build
 WORKDIR /app
