@@ -36,6 +36,7 @@ type TripSpot struct {
 }
 
 type Spot struct {
+	ID          primitive.ObjectID `json:"_id,omitempty" bson:"_id"`
 	RoadtripId  primitive.ObjectID `json:"roadtripId,omitempty" bson:"roadtripId"`
 	Title       string             `json:"title,omitempty" bson:"title"`
 	Latitude    float64            `json:"latitude,omitempty" bson:"latitude"`
@@ -241,7 +242,6 @@ func (db *db) GetSpot(spotId string) (*Spot, error) {
 	result := db.spots.FindOne(context.TODO(), bson.D{{Key: "_id", Value: objectId}})
 
 	var spot Spot
-
 	err = result.Decode(&spot)
 	if err != nil {
 		return nil, err
