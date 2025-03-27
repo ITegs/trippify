@@ -124,6 +124,8 @@ paths:
     post:
       operationId: addSpotToTrip.post
       summary: Add a spot to a given trip
+      security:
+        - bearerAuth: []
       parameters:
         - name: tripId
           in: path
