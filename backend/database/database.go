@@ -205,11 +205,22 @@ func (db *db) NewTrip(trip *Trip) error {
 }
 
 func (db *db) AddSpot(spot Spot) error {
+	spot.ID = primitive.NewObjectID()
 	spotResult, err := db.spots.InsertOne(context.TODO(), spot)
 	if err != nil {
 		return err
 	}
 	fmt.Println("Inserted a new spot: ", spotResult.InsertedID)
+
+	// set the last spots date_to to now
+	filter := bson.D{{Key: "date_to", Value: ""}}
+	update := bson.D{{"$set", bson.D{{"date_to", spot.DateFrom}}}}
+	dateToResult, err := db.spots.UpdateMany(context.TODO(), filter, update)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(dateToResult.ModifiedCount)
 
 	tripSpot := TripSpot{
 		SpotId:    spotResult.InsertedID.(primitive.ObjectID),
@@ -217,8 +228,8 @@ func (db *db) AddSpot(spot Spot) error {
 		Latitude:  spot.Latitude,
 	}
 
-	filter := bson.D{{Key: "_id", Value: spot.RoadtripId}}
-	update := bson.D{
+	filter = bson.D{{Key: "_id", Value: spot.RoadtripId}}
+	update = bson.D{
 		{Key: "$push", Value: bson.D{
 			{Key: "spots", Value: tripSpot},
 		}},
