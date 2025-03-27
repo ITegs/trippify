@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"github.com/ITegs/trippify/apiserver/middleware"
 	"github.com/ITegs/trippify/database"
+	"github.com/ITegs/trippify/utils"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 )
@@ -41,7 +43,11 @@ func (api *apiServer) Main() {
 	fmt.Printf("API server listening on %s\n", server.Addr)
 
 	// Add CORS support (Cross Origin Resource Sharing)
-	handler := cors.Default().Handler(server.Handler)
+	handler := cors.New(cors.Options{
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}).Handler(server.Handler)
 	err := http.ListenAndServe(server.Addr, handler)
 	if err != nil {
 		fmt.Println("SERVER FAILED: ", err)
@@ -70,6 +76,11 @@ func (api *apiServer) buildApi() *httprouter.Router {
 				w.Write([]byte("API is up and running!"))
 				w.WriteHeader(http.StatusOK)
 			}),
+		},
+		{
+			Method:  http.MethodPost,
+			Path:    "/login",
+			Handler: httprouter.Handle(api.Login),
 		},
 		{
 			Method:  http.MethodGet,
@@ -122,6 +133,36 @@ func (api *apiServer) buildApi() *httprouter.Router {
 	}
 
 	return router
+}
+
+func (api *apiServer) Login(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	var recievedUser database.User
+	err := json.NewDecoder(r.Body).Decode(&recievedUser)
+	if err != nil || recievedUser.Username == "" || recievedUser.Password == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	realUser, err := api.db.GetUserByUsername(recievedUser.Username)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(realUser.Password), []byte(recievedUser.Password))
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	jwt, err := utils.GenerateJWT(realUser.Username)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(jwt))
 }
 
 func (api *apiServer) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -283,6 +324,9 @@ func (api *apiServer) AddSpot(w http.ResponseWriter, r *http.Request, p httprout
 		fmt.Println(err)
 		return
 	}
+
+	//claims := r.Context().Value(middleware.UserContextKey).(*utils.CustomClaims)
+	//if(claims.Username != )
 
 	err = api.db.AddSpot(spot)
 	if err != nil {

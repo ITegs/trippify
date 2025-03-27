@@ -30,7 +30,23 @@ paths:
                 $ref: "#/components/schemas/User"
         404:
           $ref: "#/components/responses/ErrorResponse"
-
+  /api/login:
+    post:
+      operationId: login.post
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUser"
+      responses:
+        200:
+          description: Logged in
+          content:
+            text/plain:
+              schema:
+                type: string
   /api/newUser:
     post:
       operationId: newUser.post
@@ -88,6 +104,8 @@ paths:
     post:
       operationId: newTrip.post
       summary: Create a new trip
+      security:
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -149,29 +167,47 @@ paths:
           $ref: "#/components/responses/ErrorResponse"
 
 components:
+  securitySchemes:
+    bearerAuth:
+      description: JWT Authentication using an OIDC id_token issued by Google for YouTuBox
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT
+
   schemas:
-    NewUser:
+    LoginUser:
       type: object
       required:
         - username
-        - name
+        - password
       properties:
         username:
           $ref: "#/components/schemas/Username"
+        password:
+          type: string
+
+    NewUser:
+      allOf:
+        - $ref: "#/components/schemas/LoginUser"
+      properties:
         name:
           type: string
         profile_pic:
           type: string
 
     User:
-      allOf:
-        - $ref: "#/components/schemas/NewUser"
       type: object
       required:
         - _id
       properties:
         _id:
           $ref: "#/components/schemas/ObjectId"
+        username:
+          $ref: "#/components/schemas/Username"
+        name:
+          type: string
+        profile_pic:
+          type: string
         trips:
           type: array
           items:
