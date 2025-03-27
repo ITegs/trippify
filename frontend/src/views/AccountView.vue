@@ -9,9 +9,11 @@ let password = ''
 function login(event: Event) {
   event.preventDefault()
   userStore.login(username, password)
+  userStore.getUserFromLocalStorage()
 }
 
-function logout() {
+function logout(event: Event) {
+  event.preventDefault()
   userStore.logout()
 }
 </script>
@@ -23,10 +25,10 @@ function logout() {
       <input name="password" type="password" v-model="password" placeholder="Password" />
       <button>Login</button>
     </form>
-    <div v-else>
+    <form v-else @submit="logout">
       Logged in as {{ userStore.user.username }}
-      <button @click="logout">Logout</button>
-    </div>
+      <button>Logout</button>
+    </form>
   </main>
 </template>
 
@@ -36,13 +38,12 @@ main {
   width: 100%;
   padding-inline: 1rem;
   display: flex;
-  flex-direction: column;
-
   align-items: center;
   justify-content: center;
 
-  .login {
+  form {
     display: flex;
+    flex-direction: column;
     gap: 0.5rem;
 
     input {
@@ -52,16 +53,16 @@ main {
       font-size: 1.3rem;
       font-weight: 600;
     }
-  }
 
-  button {
-    background-color: var(--color-primary);
-    color: var(--color-text);
-    border: none;
-    border-radius: 10px;
-    padding: 0.5rem 1rem;
-    font-size: 1.3rem;
-    font-weight: 600;
+    button {
+      background-color: var(--color-primary);
+      color: var(--color-text);
+      border: none;
+      border-radius: 10px;
+      padding: 0.5rem 1rem;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
   }
 }
 </style>

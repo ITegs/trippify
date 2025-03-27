@@ -2,14 +2,19 @@ import { defineStore } from 'pinia'
 import { DefaultApi, type Spot, type Trip } from 'trippify-client/api'
 import type { NewSpot } from 'trippify-client'
 
-const accessToken = localStorage.getItem('JWT') || ''
-const apiConfig = {
-  isJsonMime(): boolean {
-    return false
-  },
-  accessToken
-}
+const apiConfig = createApiConfig()
 const api = new DefaultApi(apiConfig)
+
+function createApiConfig(): any {
+  return {
+    isJsonMime: () => false,
+    accessToken: getAccessToken()
+  }
+}
+
+function getAccessToken(): string {
+  return localStorage.getItem('accessToken') || ''
+}
 
 export const useTripStore = defineStore('trip', {
   state: () => ({

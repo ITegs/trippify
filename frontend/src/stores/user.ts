@@ -3,14 +3,24 @@ import { DefaultApi, type User } from 'trippify-client/api'
 
 const LOCAL_STORAGE_KEY = 'trippify-user'
 
-const accessToken = localStorage.getItem('JWT') || ''
-const apiConfig = {
-  isJsonMime(): boolean {
-    return false
-  },
-  accessToken
+let apiConfig = createApiConfig()
+let api = new DefaultApi(apiConfig)
+
+function refreshConfig() {
+  apiConfig = createApiConfig()
+  api = new DefaultApi(apiConfig)
 }
-const api = new DefaultApi(apiConfig)
+
+function createApiConfig(): any {
+  return {
+    isJsonMime: () => false,
+    accessToken: getAccessToken()
+  }
+}
+
+function getAccessToken(): string {
+  return localStorage.getItem('accessToken') || ''
+}
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -25,6 +35,7 @@ export const useUserStore = defineStore('user', {
 
   actions: {
     async getUserFromLocalStorage() {
+      refreshConfig()
       const userRaw = localStorage.getItem(LOCAL_STORAGE_KEY)
       if (!userRaw) {
         return
@@ -39,12 +50,13 @@ export const useUserStore = defineStore('user', {
 
       this.$patch({ user })
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(user))
-      localStorage.setItem('JWT', jwt)
+      localStorage.setItem('accessToken', jwt)
     },
 
     async logout() {
       this.$reset()
       localStorage.setItem(LOCAL_STORAGE_KEY, '')
+      localStorage.setItem('accessToken', '')
     }
   }
 })
