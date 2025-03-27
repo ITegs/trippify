@@ -2,7 +2,7 @@
   <div class="container">
     <div
       class="addSpot"
-      v-if="userStore.user._id === tripStore.trip.owner?._id"
+      v-if="userStore.user.username && userStore.user.username === tripStore.trip.owner_username"
       @click="goToAddSpot"
     >
       <font-awesome-icon :icon="['fas', 'plus']" />
