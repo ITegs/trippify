@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/ITegs/trippify/apiserver/middleware"
 	"github.com/ITegs/trippify/database"
-	"github.com/ITegs/trippify/utils"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -58,6 +57,12 @@ type Middleware interface {
 	Handler(httprouter.Handle) httprouter.Handle
 }
 
+type MiddlewareFunc func(httprouter.Handle) httprouter.Handle
+
+func (m MiddlewareFunc) Handler(next httprouter.Handle) httprouter.Handle {
+	return m(next)
+}
+
 type Route struct {
 	Method     string
 	Path       string
@@ -106,13 +111,13 @@ func (api *apiServer) buildApi() *httprouter.Router {
 			Method:     http.MethodPost,
 			Path:       "/newTrip",
 			Handler:    httprouter.Handle(api.NewTrip),
-			Middleware: []Middleware{middleware.Auth{}},
+			Middleware: []Middleware{MiddlewareFunc(middleware.Auth)},
 		},
 		{
 			Method:     http.MethodPost,
 			Path:       "/trip/:tripId/spot/add",
 			Handler:    httprouter.Handle(api.AddSpot),
-			Middleware: []Middleware{middleware.Auth{}},
+			Middleware: []Middleware{MiddlewareFunc(middleware.Auth)},
 		},
 		{
 			Method:  http.MethodGet,
@@ -155,7 +160,7 @@ func (api *apiServer) Login(w http.ResponseWriter, r *http.Request, p httprouter
 		return
 	}
 
-	jwt, err := utils.GenerateJWT(realUser.Username)
+	jwt, err := middleware.GenerateJWT(realUser.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

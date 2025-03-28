@@ -57,7 +57,10 @@ var mCl *mongo.Client
 func init() {
 	fmt.Println("Initializing the DB")
 
-	dbUri := os.Getenv("DATABASE_URI")
+	dbUri, ok := os.LookupEnv("DATABASE_URI")
+	if !ok {
+		dbUri = "mongodb://localhost:27017"
+	}
 
 	clientOptions := options.Client().ApplyURI(dbUri)
 	mongoClient, err := mongo.Connect(context.TODO(), clientOptions)
