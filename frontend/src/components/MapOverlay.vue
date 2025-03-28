@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
 import { useTripStore } from '@/stores/trip'
-import { computed, ref } from 'vue'
+import { computed, type ComputedRef, type Ref, ref } from 'vue'
 import type { LatLngTuple } from 'leaflet'
 
 const props = defineProps<{
@@ -29,14 +29,14 @@ enum View {
   ALL_SPOTS
 }
 
-const viewIconMap = {
+const viewIconMap: Record<View, [string, string]> = {
   [View.LAST_THREE]: ['fas', 'circle-nodes'],
   [View.CURRENT_SPOT]: ['fas', 'map-pin'],
   [View.ALL_SPOTS]: ['fas', 'map']
 }
 
-const currentView = ref<View>(View.LAST_THREE)
-const upcomingView = computed(() => (currentView.value + 1) % 3)
+const currentView: Ref<View> = ref<View>(View.LAST_THREE)
+const upcomingView: ComputedRef<View> = computed(() => (currentView.value + 1) % 3)
 
 function nextView() {
   currentView.value = (currentView.value + 1) % 3
