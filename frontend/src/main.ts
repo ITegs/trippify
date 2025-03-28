@@ -15,12 +15,15 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
   faChevronDown,
   faChevronLeft,
+  faCircleNodes,
+  faMap,
+  faMapPin,
   faPlus,
   faSync,
   faTimes
 } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faPlus, faChevronDown, faChevronLeft, faSync, faTimes)
+library.add(faPlus, faChevronDown, faChevronLeft, faSync, faTimes, faMap, faMapPin, faCircleNodes)
 
 const app = createApp(App).component('font-awesome-icon', FontAwesomeIcon)
 

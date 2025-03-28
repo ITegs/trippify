@@ -1,14 +1,14 @@
 <template>
   <div>
-    <MapOverlay id="mapOverlay" />
+    <MapOverlay :map="map" id="mapOverlay" />
     <div id="map" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, watch } from 'vue'
-import * as L from 'leaflet'
 import type { LatLngTuple } from 'leaflet'
+import * as L from 'leaflet'
 import 'leaflet-doubletapdrag'
 import 'leaflet-doubletapdragzoom'
 import MapOverlay from '@/components/MapOverlay.vue'
@@ -86,15 +86,12 @@ function drawPath(marker: Marker[], map: L.Map) {
 
 function setViewToCenter(marker: Marker[], map: L.Map) {
   const fitBoundsOptions: L.FitBoundsOptions = {
-    paddingBottomRight: [0, 120]
+    paddingBottomRight: [0, 140]
   }
 
-  const latLngs: LatLngTuple[] = marker.map((m) => {
-    return m.latLng
-  })
+  const last3Bounds: LatLngTuple[] = marker.slice(-3).map((m) => m.latLng)
 
-  const bounds = L.latLngBounds(latLngs)
-  map.fitBounds(bounds, fitBoundsOptions)
+  map.fitBounds(last3Bounds, fitBoundsOptions)
 }
 
 function handleMarkerClick(spotId: string) {
