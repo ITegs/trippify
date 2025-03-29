@@ -3,6 +3,7 @@
     <Map
       id="homeMap"
       :marker="marker"
+      :currentSpotId="currentSpotId"
       @changedSpot="changeSpot"
       @nextSpot="toNextSpot"
       @prevSpot="toPrevSpot"

@@ -2,8 +2,11 @@
   <div>
     <MapOverlay
       :map="map"
+      :currentSpotId="currentSpotId"
+      @changedSpot="(spotId) => emit('changedSpot', spotId)"
       @nextSpot="() => emit('nextSpot')"
       @prevSpot="() => emit('prevSpot')"
+      id="mapOverlay"
     />
     <div id="map" />
   </div>
@@ -24,6 +27,7 @@ type Marker = {
 
 const props = defineProps<{
   marker: Marker[]
+  currentSpotId: string
 }>()
 
 const emit = defineEmits<{

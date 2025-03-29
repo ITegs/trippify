@@ -4,10 +4,10 @@
       <div class="changeView" @click="nextView">
         <font-awesome-icon :icon="viewIconMap[currentView]" />
       </div>
-      <div class="nextSpot" @click="() => emit('nextSpot')">
+      <div class="nextSpot" @click="nextSpot">
         <font-awesome-icon :icon="['fas', 'arrow-right']" />
       </div>
-      <div class="previousSpot" @click="() => emit('prevSpot')">
+      <div class="previousSpot" @click="prevSpot">
         <font-awesome-icon :icon="['fas', 'arrow-left']" />
       </div>
     </div>
@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
 import { useTripStore } from '@/stores/trip'
-import { type Ref, ref } from 'vue'
+import { type Ref, ref, watch } from 'vue'
 import type { LatLngTuple } from 'leaflet'
 
 const userStore = useUserStore()
@@ -32,9 +32,11 @@ const tripStore = useTripStore()
 
 const props = defineProps<{
   map: L.Map
+  currentSpotId: string
 }>()
 
 const emit = defineEmits<{
+  (e: 'changedSpot', spotId: string): void
   (e: 'nextSpot'): void
   (e: 'prevSpot'): void
 }>()
@@ -44,6 +46,18 @@ enum View {
   CURRENT_SPOT,
   ALL_SPOTS
 }
+
+watch(props, async (newProps) => {
+  const spotId = newProps.currentSpotId
+  await tripStore.fetchSpot(spotId)
+  const spot = tripStore.spots.find((s) => s._id == spotId)
+  if (!spot) {
+    return
+  }
+  props.map.flyTo([spot.latitude, spot.longitude], 15, {
+    duration: 1
+  })
+})
 
 const viewIconMap: Record<View, [string, string]> = {
   [View.LAST_THREE]: ['fas', 'circle-nodes'],
@@ -57,9 +71,11 @@ function nextView() {
   currentView.value = (currentView.value + 1) % 3
 
   const spots = tripStore.trip.spots || []
-  const lastSpot = spots[spots.length - 1] || { latitude: 0, longitude: 0 }
+  const lastSpot = spots[spots.length - 1] || { spotId: 0, latitude: 0, longitude: 0 }
   const last3Bounds: LatLngTuple[] = spots.slice(-3).map((spot) => [spot.latitude, spot.longitude])
   const allBounds: LatLngTuple[] = spots.map((spot) => [spot.latitude, spot.longitude])
+
+  emit('changedSpot', lastSpot.spotId)
 
   switch (currentView.value) {
     case View.CURRENT_SPOT:
@@ -72,6 +88,16 @@ function nextView() {
       props.map.fitBounds(allBounds, { paddingBottomRight: [0, 180] })
       break
   }
+}
+
+function nextSpot() {
+  currentView.value = View.CURRENT_SPOT
+  emit('nextSpot')
+}
+
+function prevSpot() {
+  currentView.value = View.CURRENT_SPOT
+  emit('prevSpot')
 }
 
 function goToAddSpot() {
