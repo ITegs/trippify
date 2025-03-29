@@ -1,6 +1,10 @@
 <template>
   <div>
-    <MapOverlay :map="map" id="mapOverlay" />
+    <MapOverlay
+      :map="map"
+      @nextSpot="() => emit('nextSpot')"
+      @prevSpot="() => emit('prevSpot')"
+    />
     <div id="map" />
   </div>
 </template>
@@ -24,6 +28,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'changedSpot', spotId: string): void
+  (e: 'nextSpot'): void
+  (e: 'prevSpot'): void
 }>()
 
 let map: L.Map

@@ -1,6 +1,12 @@
 <template>
   <div class="noscroll">
-    <Map id="homeMap" :marker="marker" @changedSpot="changeSpot" />
+    <Map
+      id="homeMap"
+      :marker="marker"
+      @changedSpot="changeSpot"
+      @nextSpot="toNextSpot"
+      @prevSpot="toPrevSpot"
+    />
     <Modal
       id="modal"
       :pretitle="`${spot.latitude} // ${spot.longitude}`"
@@ -43,6 +49,8 @@ type Marker = {
 
 const marker: Ref<Marker[]> = ref([] as Marker[])
 
+const currentSpotId = ref()
+
 onBeforeMount(async () => {
   if (route.params.tripId) {
     await tripStore.setTrip(route.params.tripId as string)
@@ -50,9 +58,9 @@ onBeforeMount(async () => {
 })
 
 watch(tripStore.trip, async () => {
-  const firstSpot = tripStore.trip.spots?.[tripStore.trip.spots?.length - 1]
-  if (firstSpot) {
-    spot.value = await tripStore.fetchSpot(firstSpot.spotId)
+  const initialSpot = tripStore.trip.spots?.[tripStore.trip.spots?.length - 1]
+  if (initialSpot) {
+    spot.value = await tripStore.fetchSpot(initialSpot.spotId)
   }
 
   dateFrom.value = new Date(spot.value.date_from)
@@ -65,14 +73,39 @@ watch(tripStore.trip, async () => {
       return { spotId: spot.spotId, latLng: [spot.latitude, spot.longitude] }
     })
   }
+
+  currentSpotId.value = initialSpot?.spotId
 })
 
 async function changeSpot(spotId: string) {
+  currentSpotId.value = spotId
   spot.value = await tripStore.fetchSpot(spotId)
 
   dateFrom.value = new Date(spot.value.date_from)
   if (spot.value.date_to) {
     dateTo.value = new Date(spot.value.date_to!)
+  }
+}
+
+async function toNextSpot() {
+  const currentSpotIndex = tripStore.trip.spots?.findIndex(
+    (spot) => spot.spotId === currentSpotId.value
+  )
+  if (
+    currentSpotIndex !== undefined &&
+    tripStore.trip.spots &&
+    currentSpotIndex < tripStore.trip.spots?.length - 1
+  ) {
+    await changeSpot(tripStore.trip.spots[currentSpotIndex + 1].spotId)
+  }
+}
+
+function toPrevSpot() {
+  const currentSpotIndex = tripStore.trip.spots?.findIndex(
+    (spot) => spot.spotId === currentSpotId.value
+  )
+  if (currentSpotIndex !== undefined && currentSpotIndex > 0 && tripStore.trip.spots) {
+    changeSpot(tripStore.trip.spots[currentSpotIndex - 1].spotId)
   }
 }
 </script>

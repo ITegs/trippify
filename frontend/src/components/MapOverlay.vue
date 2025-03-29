@@ -1,7 +1,15 @@
 <template>
   <div class="container">
-    <div class="changeView" @click="nextView">
-      <font-awesome-icon :icon="viewIconMap[upcomingView]" />
+    <div class="leftSidebar">
+      <div class="changeView" @click="nextView">
+        <font-awesome-icon :icon="viewIconMap[currentView]" />
+      </div>
+      <div class="nextSpot" @click="() => emit('nextSpot')">
+        <font-awesome-icon :icon="['fas', 'arrow-right']" />
+      </div>
+      <div class="previousSpot" @click="() => emit('prevSpot')">
+        <font-awesome-icon :icon="['fas', 'arrow-left']" />
+      </div>
     </div>
     <div
       class="addSpot"
@@ -16,11 +24,19 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
 import { useTripStore } from '@/stores/trip'
-import { computed, type ComputedRef, type Ref, ref } from 'vue'
+import { type Ref, ref } from 'vue'
 import type { LatLngTuple } from 'leaflet'
+
+const userStore = useUserStore()
+const tripStore = useTripStore()
 
 const props = defineProps<{
   map: L.Map
+}>()
+
+const emit = defineEmits<{
+  (e: 'nextSpot'): void
+  (e: 'prevSpot'): void
 }>()
 
 enum View {
@@ -36,7 +52,6 @@ const viewIconMap: Record<View, [string, string]> = {
 }
 
 const currentView: Ref<View> = ref<View>(View.LAST_THREE)
-const upcomingView: ComputedRef<View> = computed(() => (currentView.value + 1) % 3)
 
 function nextView() {
   currentView.value = (currentView.value + 1) % 3
@@ -62,9 +77,6 @@ function nextView() {
 function goToAddSpot() {
   window.location.href = '/addSpot'
 }
-
-const userStore = useUserStore()
-const tripStore = useTripStore()
 </script>
 
 <style scoped lang="scss">
@@ -79,28 +91,33 @@ const tripStore = useTripStore()
   height: 100%;
   width: 100%;
 
-  .changeView {
+  .leftSidebar {
     position: absolute;
     left: 0;
     top: 7dvh;
     margin-left: 1rem;
     margin-top: 1rem;
-    height: 35px;
 
-    border-radius: 50%;
-    aspect-ratio: 1;
+    div {
+      height: 40px;
 
-    background-color: var(--color-text);
-    color: var(--color-background);
+      border-radius: 50%;
+      aspect-ratio: 1;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow:
-      rgba(0, 0, 0, 0.1) 0 4px 6px -1px,
-      rgba(0, 0, 0, 0.06) 0 2px 4px -1px;
+      background-color: var(--color-text);
+      color: var(--color-background);
 
-    cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        rgba(0, 0, 0, 0.1) 0 4px 6px -1px,
+        rgba(0, 0, 0, 0.06) 0 2px 4px -1px;
+
+      cursor: pointer;
+
+      margin-bottom: 0.5rem;
+    }
   }
 
   .addSpot {

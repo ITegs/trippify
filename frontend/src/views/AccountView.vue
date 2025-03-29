@@ -35,9 +35,6 @@ function logout(event: Event) {
       <button>Logout</button>
     </form>
     <p>
-      Hier log ich mich ein :)
-      <br />
-      <br />
       Profilerstellung kommt erst in der v3. Sorry!
       <br />
       Zum Trost eine lustige Katze:
@@ -61,6 +58,7 @@ main {
     color: var(--color-primary);
     font-weight: 900;
     font-size: 1.5rem;
+    margin-top: 9dvh;
     margin-bottom: 2rem;
     border: 2px solid var(--color-secondary);
     padding: 0.5rem 1rem;
