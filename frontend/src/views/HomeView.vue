@@ -1,5 +1,8 @@
 <template>
   <div class="noscroll">
+    <span class="loader" v-if="loading">
+      <font-awesome-icon :icon="['fas', 'compass']" size="2x" inverse spin />
+    </span>
     <Map
       id="homeMap"
       :marker="marker"
@@ -34,10 +37,12 @@ import { useTripStore } from '@/stores/trip'
 import type { Spot } from 'trippify-client/api'
 import { type LatLngTuple } from 'leaflet'
 import { useRoute } from 'vue-router'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 const route = useRoute()
-
 const tripStore = useTripStore()
+
+const loading: Ref<boolean> = ref(false)
 
 const spot: Ref<Spot> = ref({} as Spot)
 const dateFrom: Ref<Date> = ref(new Date())
@@ -79,6 +84,7 @@ watch(tripStore.trip, async () => {
 })
 
 async function changeSpot(spotId: string) {
+  loading.value = true
   currentSpotId.value = spotId
   spot.value = await tripStore.fetchSpot(spotId)
 
@@ -86,6 +92,7 @@ async function changeSpot(spotId: string) {
   if (spot.value.date_to) {
     dateTo.value = new Date(spot.value.date_to!)
   }
+  loading.value = false
 }
 
 async function toNextSpot() {
@@ -115,6 +122,17 @@ function toPrevSpot() {
 .noscroll {
   position: fixed;
   overflow: hidden;
+}
+
+.loader {
+  position: fixed;
+  z-index: 999;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #homeMap {

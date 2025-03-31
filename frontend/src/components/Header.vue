@@ -1,6 +1,7 @@
 <template>
   <div class="header">
-    <a href="/" class="logo">trippify</a>
+    <a href="/" class="logo">trippify <span class="beta">beta</span></a>
+
     <div v-if="trip?.owner" class="tripInfo">
       <p>
         <u>{{ trip.owner.name }}</u> ist unterwegs:
@@ -42,6 +43,14 @@ const props = defineProps<{
     font-size: 1.2rem;
 
     text-decoration: none;
+  }
+
+  .beta {
+    font-size: 0.6rem;
+    position: relative;
+    top: 1dvh;
+    font-family: monospace;
+    color: var(--color-text);
   }
 
   .tripInfo {

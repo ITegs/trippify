@@ -218,18 +218,6 @@ useDrag(dragHandler, {
   }
 }
 
-.full {
-  .content {
-    :deep(img) {
-      height: 100% !important;
-    }
-
-    :deep(.swiper-wrapper) {
-      height: 100% !important;
-    }
-  }
-}
-
 #modal {
   background-color: var(--color-background);
   border-radius: 20px 20px 0 0;

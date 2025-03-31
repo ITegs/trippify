@@ -18,6 +18,7 @@ import {
   faChevronDown,
   faChevronLeft,
   faCircleNodes,
+  faCompass,
   faMap,
   faMapPin,
   faPlus,
@@ -35,7 +36,8 @@ library.add(
   faMapPin,
   faCircleNodes,
   faArrowRight,
-  faArrowLeft
+  faArrowLeft,
+  faCompass
 )
 
 const app = createApp(App).component('font-awesome-icon', FontAwesomeIcon)

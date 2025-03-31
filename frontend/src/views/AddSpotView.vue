@@ -58,6 +58,10 @@
       <p class="status">{{ status }}</p>
       <button @click="submit">Hochladen</button>
     </div>
+
+    <!--    TODO-->
+    <input type="number" v-model="spot.latitude" />
+    <input type="number" v-model="spot.longitude" />
   </main>
 </template>
 
